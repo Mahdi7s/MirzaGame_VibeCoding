@@ -20,98 +20,153 @@ export const levels: Level[] = [
   {
     id: 1,
     name: "مرحله اول",
-    letters: ["ا", "ن", "ا", "ر", "ب"], 
+    letters: ["ب", "ن", "ا", "ت"], 
     targetWords: [
-      { word: "انار", startX: 0, startY: 0, direction: "horizontal" }, 
-      { word: "ناب", startX: 1, startY: 0, direction: "vertical" },   
+      { word: "نبات", startX: 0, startY: 0, direction: "horizontal" }, 
+      { word: "بنا", startX: 0, startY: 1, direction: "horizontal" },   
+      { word: "تاب", startX: 0, startY: 2, direction: "horizontal" },   
     ],
-    bonusWords: ["ابر", "بار", "ربا", "ران", "بنا", "نار", "رب", "آب", "برنا", "بان", "انبر"], 
+    bonusWords: ["تب", "تن", "بت", "بان", "آب", "تا", "آن"], 
     backgroundUrl: "https://placehold.co/1920x1080.png",
-    gridSize: { rows: 4, cols: 4 },
+    gridSize: { rows: 5, cols: 5 },
   },
   {
     id: 2,
     name: "مرحله دوم",
-    letters: ["س", "ی", "ب", "ا", "م", "ر", "ز", "ش", "ه"], // "ه" اضافه شد
+    letters: ["ر", "ن", "ج", "ب"],
     targetWords: [
-      { word: "سیب", startX: 0, startY: 0, direction: "horizontal" }, 
-      { word: "بام", startX: 2, startY: 0, direction: "vertical" },   
-      { word: "آسیا", startX: 0, startY: 2, direction: "horizontal" }, 
-      { word: "شیر", startX: 1, startY: 1, direction: "vertical" },
-      { word: "مهر", startX: 0, startY: 4, direction: "horizontal" },
+      { word: "برنج", startX: 0, startY: 0, direction: "horizontal" }, 
+      { word: "رنج", startX: 0, startY: 1, direction: "horizontal" },   
+      { word: "برج", startX: 0, startY: 2, direction: "horizontal" }, 
     ],
-    bonusWords: ["سام", "بیم", "آبی", "سرب", "سراب", "مربی", "بار", "سار", "بیمار", "مرز", "زیبا", "میراث", "سیراب", "ریش", "شیب", "میش", "آش", "مار", "بشر", "ماه", "سهم", "شبیه"],
+    bonusWords: ["جن", "رج", "رب"],
     backgroundUrl: "https://placehold.co/1920x1080.png",
     gridSize: { rows: 5, cols: 5 },
   },
   {
     id: 3,
     name: "مرحله سوم",
-    letters: ["ک", "ت", "ا", "ب", "ف", "ل", "ش", "ق", "د"], // "د" اضافه شد
+    letters: ["م", "ش", "ک", "ت"],
     targetWords: [
-      { word: "کتاب", startX: 0, startY: 0, direction: "horizontal" }, 
-      { word: "تاب", startX: 2, startY: 0, direction: "vertical" }, 
-      { word: "شال", startX: 0, startY: 1, direction: "horizontal"},
-      { word: "قفل", startX: 3, startY: 1, direction: "vertical"}, 
-      { word: "ادب", startX: 1, startY: 2, direction: "horizontal"},
+      { word: "تمشک", startX: 0, startY: 0, direction: "horizontal" }, 
+      { word: "مشک", startX: 0, startY: 1, direction: "horizontal" }, 
+      { word: "شکم", startX: 0, startY: 2, direction: "horizontal" }, 
+      { word: "تشک", startX: 0, startY: 3, direction: "horizontal" }, 
     ],
-    bonusWords: ["کف", "بک", "بافت", "تابک", "فلات", "کابل", "لاک", "باک", "لفت", "کشف", "بال", "فلش", "شکاف", "کفاش", "شق", "قلب", "قاتل", "بشقاب", "کاشف", "دقت", "فدا", "لشک"],
+    bonusWords: ["شک", "مت", "کشت"],
     backgroundUrl: "https://placehold.co/1920x1080.png",
-    gridSize: { rows: 5, cols: 5 }, 
+    gridSize: { rows: 6, cols: 6 },
   },
-  ...Array.from({ length: 7 }, (_, i) => {
-    const allPossibleLetters = ["د", "ر", "س", "ت", "و", "ن", "ی", "م", "ه", "گ", "پ", "چ", "ز", "ژ", "ش", "خ", "ج", "ع", "غ", "ص", "ض", "ط", "ظ", "ق", "ک", "ل", "ف", "ذ"];
-    let currentLettersSet = new Set<string>();
-    const numLetters = Math.floor(Math.random() * 3) + 5; // 5 to 7 letters
-    while(currentLettersSet.size < Math.min(allPossibleLetters.length, numLetters)) {
-        currentLettersSet.add(allPossibleLetters[Math.floor(Math.random() * allPossibleLetters.length)]);
-    }
-    const currentLetters = Array.from(currentLettersSet);
-
-    // Example target words (needs a real puzzle generation logic for meaningful crosswords)
-    let exampleTargetWords: CrosswordEntry[] = [];
-    if (currentLetters.includes("د") && currentLetters.includes("ر") && currentLetters.includes("س") && currentLetters.includes("ت")) {
-        exampleTargetWords.push({ word: "درس", startX: 0, startY: 0, direction: "horizontal" });
-        if (currentLetters.length > 4) exampleTargetWords.push({ word: "دست", startX: 0, startY: 0, direction: "vertical" });
-    } else if (currentLetters.includes("م") && currentLetters.includes("ه") && currentLetters.includes("ر") && currentLetters.includes("ب") && currentLetters.includes("ا") && currentLetters.includes("ن")) {
-        exampleTargetWords.push({ word: "مهربان", startX: 0, startY: 0, direction: "horizontal" });
-         if (currentLetters.includes("ر") && currentLetters.includes("ا") && currentLetters.includes("ه")) {
-            exampleTargetWords.push({ word: "راه", startX: 0, startY: 1, direction: "horizontal" });
-        }
-    } else if (currentLetters.includes("خ") && currentLetters.includes("ا") && currentLetters.includes("ن") && currentLetters.includes("ه")){
-        exampleTargetWords.push({ word: "خانه", startX: 0, startY: 1, direction: "horizontal" });
-    }
-
-    if (exampleTargetWords.length === 0 && currentLetters.includes("ا") && currentLetters.includes("ی") && currentLetters.includes("ر") && currentLetters.includes("ا") && currentLetters.includes("ن")) {
-        exampleTargetWords.push({word: "ایران", startX:0, startY:0, direction: "horizontal"});
-    } else if (exampleTargetWords.length === 0 && currentLetters.includes("و") && currentLetters.includes("ط") && currentLetters.includes("ن")) {
-       exampleTargetWords.push({word: "وطن", startX:0, startY:0, direction: "horizontal"});
-    }
-
-
-    let exampleBonusWords: string[] = [];
-     if (currentLetters.includes("ن") && currentLetters.includes("و") && currentLetters.includes("ر")) {
-        exampleBonusWords.push("نور");
-    }
-    if (currentLetters.includes("م") && currentLetters.includes("ا") && currentLetters.includes("ه")) {
-        exampleBonusWords.push("ماه");
-    }
-    if (currentLetters.includes("ش") && currentLetters.includes("ب")) {
-        exampleBonusWords.push("شب");
-    }
-    if (currentLetters.includes("د") && currentLetters.includes("ل")) {
-        exampleBonusWords.push("دل");
-    }
-
-
-    return {
-      id: i + 4,
-      name: `مرحله ${i + 4}`,
-      letters: currentLetters,
-      targetWords: exampleTargetWords.length > 0 ? exampleTargetWords : [{word: currentLetters.slice(0, Math.min(3, currentLetters.length)).join(""), startX:0, startY:0, direction: "horizontal"}], 
-      bonusWords: exampleBonusWords.length > 0 ? exampleBonusWords : ["روز", "شب"],
-      backgroundUrl: "https://placehold.co/1920x1080.png", 
-      gridSize: { rows: Math.max(5, Math.floor(Math.random()*2)+4), cols: Math.max(5, Math.floor(Math.random()*2)+4) },
-    };
-  }),
+  {
+    id: 4,
+    name: "مرحله چهارم",
+    letters: ["ر", "م", "ز", "ت"],
+    targetWords: [
+      { word: "ترمز", startX: 0, startY: 0, direction: "horizontal" },
+      { word: "رمز", startX: 0, startY: 1, direction: "horizontal" },
+      { word: "رزم", startX: 0, startY: 2, direction: "horizontal" },
+      { word: "مرز", startX: 0, startY: 3, direction: "horizontal" },
+    ],
+    bonusWords: ["رز", "رم", "مت", "مر", "تر"],
+    backgroundUrl: "https://placehold.co/1920x1080.png",
+    gridSize: { rows: 6, cols: 6 },
+  },
+  {
+    id: 5,
+    name: "مرحله پنجم",
+    letters: ["ر", "ی", "ل", "ا"],
+    targetWords: [
+      { word: "ریال", startX: 0, startY: 0, direction: "horizontal" },
+      { word: "ریل", startX: 0, startY: 1, direction: "horizontal" },
+      { word: "یار", startX: 0, startY: 2, direction: "horizontal" },
+    ],
+    bonusWords: ["یل", "ری", "ایر", "لای"],
+    backgroundUrl: "https://placehold.co/1920x1080.png",
+    gridSize: { rows: 5, cols: 5 },
+  },
+  {
+    id: 6,
+    name: "مرحله ششم",
+    letters: ["ک", "ل", "م", "ه"],
+    targetWords: [
+      { word: "کلمه", startX: 0, startY: 0, direction: "horizontal" },
+      { word: "ملکه", startX: 0, startY: 1, direction: "horizontal" },
+      { word: "کلم", startX: 0, startY: 2, direction: "horizontal" },
+      { word: "ملک", startX: 0, startY: 3, direction: "horizontal" },
+    ],
+    bonusWords: ["کل", "لک", "هم", "مه"],
+    backgroundUrl: "https://placehold.co/1920x1080.png",
+    gridSize: { rows: 6, cols: 6 },
+  },
+  {
+    id: 7,
+    name: "مرحله هفتم",
+    letters: ["پ", "ا", "ک", "ت"],
+    targetWords: [
+      { word: "پاکت", startX: 0, startY: 0, direction: "horizontal" },
+      { word: "پاک", startX: 0, startY: 1, direction: "horizontal" },
+      { word: "پتک", startX: 0, startY: 2, direction: "horizontal" },
+    ],
+    bonusWords: ["پک", "تک", "تاپ"],
+    backgroundUrl: "https://placehold.co/1920x1080.png",
+    gridSize: { rows: 5, cols: 5 },
+  },
+  {
+    id: 8,
+    name: "مرحله هشتم",
+    letters: ["ه", "ن", "ر", "ق"],
+    targetWords: [
+      { word: "نقره", startX: 0, startY: 0, direction: "horizontal" },
+      { word: "هنر", startX: 0, startY: 1, direction: "horizontal" },
+      { word: "رهن", startX: 0, startY: 2, direction: "horizontal" },
+      { word: "قرن", startX: 0, startY: 3, direction: "horizontal" },
+      { word: "نهر", startX: 0, startY: 4, direction: "horizontal" },
+    ],
+    bonusWords: ["ره", "نه", "رق"],
+    backgroundUrl: "https://placehold.co/1920x1080.png",
+    gridSize: { rows: 7, cols: 6 },
+  },
+  {
+    id: 9,
+    name: "مرحله نهم",
+    letters: ["ش", "ا", "ل", "ب"],
+    targetWords: [
+      { word: "بالش", startX: 0, startY: 0, direction: "horizontal" },
+      { word: "شال", startX: 0, startY: 1, direction: "horizontal" },
+      { word: "بال", startX: 0, startY: 2, direction: "horizontal" },
+      { word: "بلا", startX: 0, startY: 3, direction: "horizontal" },
+    ],
+    bonusWords: ["لب", "آش", "بل"],
+    backgroundUrl: "https://placehold.co/1920x1080.png",
+    gridSize: { rows: 6, cols: 6 },
+  },
+  {
+    id: 10,
+    name: "مرحله دهم",
+    letters: ["آ", "ه", "ک", "و", "ا"], // 'ا' و 'آ'
+    targetWords: [
+      { word: "کاهو", startX: 0, startY: 0, direction: "horizontal" },
+      { word: "کاوه", startX: 0, startY: 1, direction: "horizontal" },
+      { word: "آهک", startX: 0, startY: 2, direction: "horizontal" },
+      { word: "کوه", startX: 0, startY: 3, direction: "horizontal" },
+      { word: "کاه", startX: 0, startY: 4, direction: "horizontal" },
+    ],
+    bonusWords: ["آه", "کاو", "آوا", "وه"],
+    backgroundUrl: "https://placehold.co/1920x1080.png",
+    gridSize: { rows: 7, cols: 5 },
+  },
+  {
+    id: 11,
+    name: "مرحله یازدهم",
+    letters: ["م", "ی", "خ", "ر"],
+    targetWords: [
+      { word: "خمیر", startX: 0, startY: 0, direction: "horizontal" },
+      { word: "مریخ", startX: 0, startY: 1, direction: "horizontal" },
+      { word: "میخ", startX: 0, startY: 2, direction: "horizontal" },
+      { word: "خیر", startX: 0, startY: 3, direction: "horizontal" },
+    ],
+    bonusWords: ["خم", "رخ", "ری"],
+    backgroundUrl: "https://placehold.co/1920x1080.png",
+    gridSize: { rows: 6, cols: 5 },
+  },
 ];
