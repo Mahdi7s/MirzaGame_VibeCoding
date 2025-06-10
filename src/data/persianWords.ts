@@ -1,3 +1,4 @@
+
 /**
  * @fileOverview Contains a list of distinct Persian words.
  * This file should be populated with words from the provided database.
@@ -11,10 +12,10 @@
 
 export const persianWords: Set<string> = new Set([
   // Sample words - REPLACE WITH FULL LIST FROM THE GITHUB LINK
-  "ابر", "انار", "بار", "ربا", "ران", "بنا",
+  "ابر", "انار", "بار", "ربا", "ران", "بنا", "نبر",
   "سیب", "بام", "آسیا", "سام", "بیم", "آبی",
   "کتاب", "تاب", "کف", "بک",
-  "درس", "درست", "سرد", "تور",
+  "درس", "درست", "سرد", "تور", "ستون", "نور", "رود",
   "سلام", "خداحافظ", "خانه", "ماشین", "دوست", "بازار", "مدرسه", "دانشگاه",
   "ایران", "تهران", "شیراز", "اصفهان", "تبریز", "یزد", "کرمان", "رشت",
   // Add many more words here...
