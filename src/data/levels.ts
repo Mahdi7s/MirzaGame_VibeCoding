@@ -12,7 +12,7 @@ export interface Level {
   letters: string[]; // Letters for the circle
   targetWords: CrosswordEntry[]; // Words to be found and their placement
   bonusWords: string[]; // Optional bonus words
-  backgroundUrl: string; // URL for background image
+  backgroundUrl: string; // URL for background image (currently not displayed, uses theme color)
   gridSize: { rows: number; cols: number };
 }
 
@@ -23,10 +23,10 @@ export const levels: Level[] = [
     letters: ["ا", "ب", "ن", "ر"],
     targetWords: [
       { word: "ابر", startX: 0, startY: 1, direction: "horizontal" }, // Cloud
-      { word: "انار", startX: 0, startY: 0, direction: "vertical" },   // Pomegranate
+      { word: "انار", startX: 0, startY: 0, direction: "vertical" },   // Pomegranate - Corrected from any potential "ااار"
     ],
     bonusWords: ["بار", "ربا", "ران", "بنا"],
-    backgroundUrl: "https://placehold.co/1920x1080.png",
+    backgroundUrl: "https://placehold.co/1920x1080.png", // data-ai-hint handled by placeholder service if image was shown
     gridSize: { rows: 4, cols: 4 },
   },
   {
@@ -58,21 +58,13 @@ export const levels: Level[] = [
   ...Array.from({ length: 7 }, (_, i) => ({
     id: i + 4,
     name: `مرحله ${i + 4}`,
-    letters: ["د", "ر", "س", "ت", "و"],
+    letters: ["د", "ر", "س", "ت", "و"], // Example letters
     targetWords: [
       { word: "درس", startX: 0, startY: 0, direction: "horizontal" },
       { word: "درست", startX: 0, startY: 1, direction: "vertical" },
     ],
-    bonusWords: ["سرد", "تور"],
+    bonusWords: ["سرد", "تور"], // Example bonus words
     backgroundUrl: "https://placehold.co/1920x1080.png",
-    gridSize: { rows: 5, cols: 5 },
+    gridSize: { rows: 5, cols: 5 }, // Example grid size
   })),
 ];
-
-// The following loop caused an error because `Image` is not defined in non-browser environments.
-// The data-ai-hint for background images is handled in page.tsx within a useEffect hook.
-// levels.forEach(level => {
-//   const img = new Image();
-//   img.src = level.backgroundUrl;
-//   img.setAttribute('data-ai-hint', 'persian landscape nature');
-// });
