@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
@@ -20,6 +21,7 @@ export default function HomePage() {
   
   const [selectedLetterIndices, setSelectedLetterIndices] = useState<number[]>([]);
   const [currentWord, setCurrentWord] = useState("");
+  const [isDraggingWord, setIsDraggingWord] = useState(false);
   
   const [gridState, setGridState] = useState<GridCell[][]>([]);
   const [foundWords, setFoundWords] = useState<Set<string>>(new Set());
@@ -37,16 +39,13 @@ export default function HomePage() {
     const newGrid = Array(level.gridSize.rows)
       .fill(null)
       .map(() => Array(level.gridSize.cols).fill(null));
-    
-    // If we want to pre-fill parts of the grid or show already found words on load:
-    // This example starts fresh.
     return newGrid;
   }, []);
 
   useEffect(() => {
     const newLevel = levels[currentLevelIndex];
     setCurrentLevel(newLevel);
-    setAvailableLetters([...newLevel.letters].sort(() => Math.random() - 0.5)); // Shuffle initial letters
+    setAvailableLetters([...newLevel.letters].sort(() => Math.random() - 0.5));
     setGridState(initializeGrid(newLevel));
     setFoundWords(new Set());
     setFoundBonusWords(new Set());
@@ -55,37 +54,23 @@ export default function HomePage() {
     setIsLevelComplete(false);
     setHintsUsedThisLevel(0);
     setRevealedHintCells(new Set());
+    setIsDraggingWord(false);
     
-    // Change background
-    document.body.style.backgroundImage = `url(${newLevel.backgroundUrl})`;
-    document.body.style.backgroundSize = 'cover';
-    document.body.style.backgroundPosition = 'center';
-    document.body.style.backgroundAttachment = 'fixed'; // Optional
-    const bgImage = new Image(); // For data-ai-hint
-    bgImage.src = newLevel.backgroundUrl;
-    bgImage.setAttribute('data-ai-hint', 'persian landscape nature');
-
+    // Remove background image styling to use simple theme background
+    document.body.style.backgroundImage = '';
+    document.body.style.backgroundSize = '';
+    document.body.style.backgroundPosition = '';
+    document.body.style.backgroundAttachment = '';
 
   }, [currentLevelIndex, initializeGrid]);
-
-  const handleLetterClick = (letter: string, index: number) => {
-    if (selectedLetterIndices.includes(index)) { // Allow deselecting the last letter
-      if (selectedLetterIndices.length > 0 && selectedLetterIndices[selectedLetterIndices.length -1] === index) {
-        setSelectedLetterIndices(prev => prev.slice(0, -1));
-        setCurrentWord(prev => prev.slice(0, -1));
-      }
-      return;
-    }
-    setSelectedLetterIndices(prev => [...prev, index]);
-    setCurrentWord(prev => prev + letter);
-  };
 
   const clearSelection = useCallback(() => {
     setSelectedLetterIndices([]);
     setCurrentWord("");
+    setIsDraggingWord(false);
   }, []);
 
-  const updateGridWithWord = (wordEntry: CrosswordEntry) => {
+  const updateGridWithWord = useCallback((wordEntry: CrosswordEntry) => {
     setGridState(prevGrid => {
       const newGrid = prevGrid.map(row => [...row]);
       for (let i = 0; i < wordEntry.word.length; i++) {
@@ -98,9 +83,9 @@ export default function HomePage() {
       }
       return newGrid;
     });
-  };
+  }, []);
 
-  const handleSubmitWord = () => {
+  const handleSubmitWord = useCallback(() => {
     if (!currentWord) return;
 
     const targetWordEntry = currentLevel.targetWords.find(entry => entry.word === currentWord);
@@ -111,22 +96,55 @@ export default function HomePage() {
       updateGridWithWord(targetWordEntry);
       toast({ title: "عالی!", description: `کلمه "${currentWord}" پیدا شد!`, variant: "default", duration: 2000 });
       
-      if (foundWords.size + 1 === currentLevel.targetWords.length) {
+      if (foundWords.size + 1 === currentLevel.targetWords.length) { // Check with +1 because state update is async
         setIsLevelComplete(true);
-        setScore(prev => prev + 50); // Level complete bonus
+        setScore(prev => prev + 50); 
       }
     } else if (currentLevel.bonusWords.includes(currentWord) && !foundBonusWords.has(currentWord)) {
       setFoundBonusWords(prev => new Set(prev).add(currentWord));
-      setScore(prev => prev + currentWord.length * 5); // Bonus word points
+      setScore(prev => prev + currentWord.length * 5);
       toast({ title: "جایزه!", description: `کلمه اضافه "${currentWord}" پیدا شد!`, variant: "default", duration: 2000 });
     } else if (foundWords.has(currentWord) || foundBonusWords.has(currentWord)) {
       toast({ title: "تکراری", description: "این کلمه قبلا پیدا شده.", variant: "destructive", duration: 2000 });
-    }
-     else {
+    } else {
       toast({ title: "اشتباه", description: "کلمه معتبر نیست. دوباره تلاش کنید!", variant: "destructive", duration: 2000 });
     }
     clearSelection();
-  };
+  }, [currentWord, currentLevel, foundWords, setFoundWords, setScore, updateGridWithWord, toast, setIsLevelComplete, foundBonusWords, setFoundBonusWords, clearSelection]);
+
+
+  const handleLetterMouseDown = useCallback((index: number) => {
+    setIsDraggingWord(true);
+    setSelectedLetterIndices([index]);
+    setCurrentWord(availableLetters[index]);
+  }, [availableLetters]);
+
+  const handleLetterMouseEnter = useCallback((index: number) => {
+    if (isDraggingWord && !selectedLetterIndices.includes(index)) {
+      setSelectedLetterIndices(prev => [...prev, index]);
+      setCurrentWord(prev => prev + availableLetters[index]);
+    }
+  }, [isDraggingWord, selectedLetterIndices, availableLetters]);
+
+  useEffect(() => {
+    const handleMouseUpGlobal = () => {
+      if (isDraggingWord) {
+        setIsDraggingWord(false);
+        handleSubmitWord();
+      }
+    };
+
+    if (isDraggingWord) {
+      document.addEventListener('mouseup', handleMouseUpGlobal);
+      document.addEventListener('touchend', handleMouseUpGlobal);
+    }
+
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUpGlobal);
+      document.removeEventListener('touchend', handleMouseUpGlobal);
+    };
+  }, [isDraggingWord, handleSubmitWord]);
+
 
   const handleShuffleLetters = () => {
     setAvailableLetters(prev => [...prev].sort(() => Math.random() - 0.5));
@@ -151,21 +169,21 @@ export default function HomePage() {
       const r = wordToHint.startY + (wordToHint.direction === 'vertical' ? i : 0);
       const c = wordToHint.startX + (wordToHint.direction === 'horizontal' ? i : 0);
       const cellKey = `${r}-${c}`;
-      if (!gridState[r][c] && !revealedHintCells.has(cellKey)) { // Check if cell is empty AND not already a hint
+      if (!gridState[r]?.[c] && !revealedHintCells.has(cellKey)) {
         setGridState(prevGrid => {
           const newGrid = prevGrid.map(row => [...row]);
           newGrid[r][c] = wordToHint.word[i];
           return newGrid;
         });
         setRevealedHintCells(prev => new Set(prev).add(cellKey));
-        setScore(prev => Math.max(0, prev - 15)); // Hint penalty
+        setScore(prev => Math.max(0, prev - 15));
         setHintsUsedThisLevel(prev => prev + 1);
         toast({ title: "راهنما استفاده شد", description: `یک حرف نشان داده شد. (-15 امتیاز)` });
         revealed = true;
         break;
       }
     }
-    if (!revealed) { // All letters of selected word are already revealed or hinted
+    if (!revealed) {
          toast({ title: "خطای راهنما", description: "امکان نمایش راهنمای بیشتر برای این کلمه نیست. سعی کنید کلمه دیگری را حل کنید", variant: "destructive" });
     }
   };
@@ -175,18 +193,16 @@ export default function HomePage() {
       setCurrentLevelIndex(prev => prev + 1);
     } else {
       toast({ title: "پایان بازی!", description: "شما تمام مراحل را با موفقیت به پایان رساندید!" });
-      // Potentially show a game over screen or reset option
     }
     setIsLevelComplete(false);
   };
   
   const isHintDisabled = useMemo(() => hintsUsedThisLevel >= MAX_HINTS_PER_LEVEL || foundWords.size === currentLevel.targetWords.length, [hintsUsedThisLevel, foundWords.size, currentLevel.targetWords.length]);
 
-
   return (
     <AnimatePresence>
       <motion.div
-        key={currentLevelIndex} // Ensures re-render on level change for animation
+        key={currentLevelIndex}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
@@ -207,16 +223,18 @@ export default function HomePage() {
           
           <LetterCircle 
             letters={availableLetters} 
-            onLetterClick={handleLetterClick}
+            onLetterMouseDown={handleLetterMouseDown}
+            onLetterMouseEnter={handleLetterMouseEnter}
             selectedIndices={selectedLetterIndices}
+            disabled={isDraggingWord && currentWord.length >= 7} // Example max word length
           />
           
           <GameControls 
-            onSubmit={handleSubmitWord}
+            onSubmit={handleSubmitWord} // Still useful if we want a manual submit button in the future
             onClear={clearSelection}
             onShuffle={handleShuffleLetters}
             onHint={handleHint}
-            canSubmit={currentWord.length > 0}
+            canSubmit={currentWord.length > 0 && !isDraggingWord}
             isHintDisabled={isHintDisabled}
           />
         </main>
@@ -232,3 +250,5 @@ export default function HomePage() {
     </AnimatePresence>
   );
 }
+
+    

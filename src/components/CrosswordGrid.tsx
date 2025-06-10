@@ -1,3 +1,4 @@
+
 import React, { type FC } from 'react';
 import type { Level } from '@/data/levels';
 
@@ -22,14 +23,14 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
   }, [targetWords]);
 
   return (
-    <div className="flex justify-center items-center p-4 bg-secondary/30 rounded-lg shadow-inner mb-6">
+    <div className="flex justify-center items-center p-4 bg-secondary/30 rounded-lg shadow-inner mb-6" dir="rtl">
       <div
         className="grid border border-border"
         style={{
           gridTemplateColumns: `repeat(${gridSize.cols}, minmax(0, 1fr))`,
-          width: `${gridSize.cols * 3}rem`, // Adjust cell size as needed
+          width: `${gridSize.cols * 3}rem`, 
           height: `${gridSize.rows * 3}rem`,
-          direction: 'ltr', // Grid itself is LTR for coordinates, content RTL
+          direction: 'rtl', // Make the grid layout RTL
         }}
       >
         {Array.from({ length: gridSize.rows }).map((_, r) =>
@@ -48,7 +49,8 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
                   ${isHint && !letter ? 'bg-primary/20' : ''}
                 `}
               >
-                {letter || (isHint ? '?' : '')}
+                {/* Ensure letter content itself respects RTL if needed by font/browser */}
+                {letter || (isHint ? '؟' : '')} 
               </div>
             );
           })
@@ -59,3 +61,5 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
 };
 
 export default CrosswordGrid;
+
+    
