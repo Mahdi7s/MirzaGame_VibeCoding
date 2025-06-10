@@ -1,3 +1,4 @@
+
 export interface CrosswordEntry {
   word: string; // The actual word in Persian
   startX: number; // 0-indexed column
@@ -68,9 +69,10 @@ export const levels: Level[] = [
   })),
 ];
 
-// Add data-ai-hint to background URLs in a real scenario
-levels.forEach(level => {
-  const img = new Image();
-  img.src = level.backgroundUrl;
-  img.setAttribute('data-ai-hint', 'persian landscape nature');
-});
+// The following loop caused an error because `Image` is not defined in non-browser environments.
+// The data-ai-hint for background images is handled in page.tsx within a useEffect hook.
+// levels.forEach(level => {
+//   const img = new Image();
+//   img.src = level.backgroundUrl;
+//   img.setAttribute('data-ai-hint', 'persian landscape nature');
+// });

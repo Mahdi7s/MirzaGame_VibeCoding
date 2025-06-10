@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import React, { type FC } from 'react';
 import type { Level } from '@/data/levels';
 
 interface CrosswordGridProps {
