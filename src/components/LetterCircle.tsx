@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { type FC } from 'react'; // Ensure React is imported if not already
+import React, { type FC, useMemo } from 'react';
 import { motion } from 'framer-motion';
 
 interface LetterCircleProps {
@@ -14,23 +14,60 @@ interface LetterCircleProps {
 
 const LetterCircle: FC<LetterCircleProps> = ({ letters, onLetterMouseDown, onLetterMouseEnter, selectedIndices, disabled }) => {
   const radius = 100; 
-  const circleSize = radius * 2 + 60;
+  const buttonSize = 48; // w-12, h-12
+  const buttonRadius = buttonSize / 2;
+  const circleContainerSize = radius * 2 + buttonSize + 20; // Adjusted for better spacing if buttons are larger
+  const svgCenter = circleContainerSize / 2;
+
+  const selectedPositions = useMemo(() => {
+    if (letters.length === 0) return [];
+    return selectedIndices.map(selectedIndex => {
+      // Find the original index of the selected letter in the `letters` array
+      // This assumes selectedIndices contains indices relative to the `letters` array
+      const angle = (selectedIndex / letters.length) * 2 * Math.PI - Math.PI / 2;
+      const letterXOffset = radius * Math.cos(angle);
+      const letterYOffset = radius * Math.sin(angle);
+      return {
+        x: svgCenter + letterXOffset,
+        y: svgCenter + letterYOffset,
+      };
+    });
+  }, [selectedIndices, letters, radius, svgCenter]);
+
 
   return (
     <div className="flex justify-center items-center my-8">
       <div
         className="relative rounded-full animate-glow border-2 border-primary/50"
-        style={{ width: `${circleSize}px`, height: `${circleSize}px` }}
-        onMouseLeave={() => {
-          // Optional: if mouse leaves the entire circle area during a drag,
-          // you might want to trigger word submission or clear selection.
-          // For now, relies on global mouseup.
-        }}
+        style={{ width: `${circleContainerSize}px`, height: `${circleContainerSize}px` }}
       >
+        <svg 
+          width={circleContainerSize} 
+          height={circleContainerSize} 
+          className="absolute top-0 left-0 pointer-events-none z-0" // Ensure SVG is behind buttons if needed, but buttons are separate DOM
+        >
+          {selectedPositions.length > 1 &&
+            selectedPositions.slice(0, -1).map((pos, i) => {
+              const nextPos = selectedPositions[i + 1];
+              return (
+                <line
+                  key={`line-${i}-${pos.x}-${pos.y}-${nextPos.x}-${nextPos.y}`} // More unique key
+                  x1={pos.x}
+                  y1={pos.y}
+                  x2={nextPos.x}
+                  y2={nextPos.y}
+                  stroke="hsl(var(--primary))"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+              );
+            })}
+        </svg>
+
         {letters.map((letter, index) => {
           const angle = (index / letters.length) * 2 * Math.PI - Math.PI / 2;
-          const x = radius * Math.cos(angle);
-          const y = radius * Math.sin(angle);
+          const x = radius * Math.cos(angle); // Offset for CSS positioning from center
+          const y = radius * Math.sin(angle); // Offset for CSS positioning from center
           const isSelected = selectedIndices.includes(index);
 
           return (
@@ -49,23 +86,19 @@ const LetterCircle: FC<LetterCircleProps> = ({ letters, onLetterMouseDown, onLet
               }}
               onTouchStart={(e) => {
                 if (!disabled) {
-                  // e.preventDefault(); // Might interfere with page scroll, test carefully
+                  // e.preventDefault(); // Can interfere with scroll, test carefully
                   onLetterMouseDown(index);
                 }
               }}
-              // onTouchMove and onTouchEnter for individual buttons is less reliable.
-              // The main logic relies on onLetterMouseEnter for mouse
-              // and global touchend for finalizing.
-              className={`absolute w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold shadow-lg
+              className={`absolute w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold shadow-lg z-10
                           ${isSelected ? 'bg-primary text-primary-foreground scale-110' : 'bg-secondary text-secondary-foreground hover:bg-primary/80'}
-                          ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                          ${disabled && !isSelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                         `}
               style={{
-                top: `calc(50% + ${y}px - 24px)`,
-                left: `calc(50% + ${x}px - 24px)`,
+                top: `calc(50% + ${y}px - ${buttonRadius}px)`,
+                left: `calc(50% + ${x}px - ${buttonRadius}px)`,
               }}
-              whileHover={{ scale: disabled ? 1 : 1.1 }}
-              // whileTap is less relevant now as mousedown initiates drag
+              whileHover={{ scale: disabled && !isSelected ? 1 : 1.1 }}
               transition={{ type: "spring", stiffness: 300 }}
               aria-label={`حرف ${letter}`}
             >
@@ -79,5 +112,3 @@ const LetterCircle: FC<LetterCircleProps> = ({ letters, onLetterMouseDown, onLet
 };
 
 export default LetterCircle;
-
-    

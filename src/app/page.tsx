@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { levels, type Level, type CrosswordEntry } from '@/data/levels';
+import { persianWords } from '@/data/persianWords';
 import GameHeader from '@/components/GameHeader';
 import LetterCircle from '@/components/LetterCircle';
 import CrosswordGrid from '@/components/CrosswordGrid';
@@ -56,7 +57,6 @@ export default function HomePage() {
     setRevealedHintCells(new Set());
     setIsDraggingWord(false);
     
-    // Remove background image styling to use simple theme background
     document.body.style.backgroundImage = '';
     document.body.style.backgroundSize = '';
     document.body.style.backgroundPosition = '';
@@ -88,15 +88,24 @@ export default function HomePage() {
   const handleSubmitWord = useCallback(() => {
     if (!currentWord) return;
 
+    const isGenerallyValid = persianWords.has(currentWord);
+
+    if (!isGenerallyValid) {
+      toast({ title: "کلمه نامعتبر", description: `"${currentWord}" در لغت‌نامه یافت نشد.`, variant: "destructive", duration: 2000 });
+      clearSelection();
+      return;
+    }
+
     const targetWordEntry = currentLevel.targetWords.find(entry => entry.word === currentWord);
 
     if (targetWordEntry && !foundWords.has(currentWord)) {
-      setFoundWords(prev => new Set(prev).add(currentWord));
+      const newFoundWords = new Set(foundWords).add(currentWord);
+      setFoundWords(newFoundWords);
       setScore(prev => prev + currentWord.length * 10);
       updateGridWithWord(targetWordEntry);
       toast({ title: "عالی!", description: `کلمه "${currentWord}" پیدا شد!`, variant: "default", duration: 2000 });
       
-      if (foundWords.size + 1 === currentLevel.targetWords.length) { // Check with +1 because state update is async
+      if (newFoundWords.size === currentLevel.targetWords.length) {
         setIsLevelComplete(true);
         setScore(prev => prev + 50); 
       }
@@ -107,43 +116,48 @@ export default function HomePage() {
     } else if (foundWords.has(currentWord) || foundBonusWords.has(currentWord)) {
       toast({ title: "تکراری", description: "این کلمه قبلا پیدا شده.", variant: "destructive", duration: 2000 });
     } else {
-      toast({ title: "اشتباه", description: "کلمه معتبر نیست. دوباره تلاش کنید!", variant: "destructive", duration: 2000 });
+      toast({ title: "کلمه معتبر", description: `"${currentWord}" یک کلمه معتبر است، اما جزو کلمات این مرحله نیست.`, variant: "default", duration: 2500 });
     }
     clearSelection();
-  }, [currentWord, currentLevel, foundWords, setFoundWords, setScore, updateGridWithWord, toast, setIsLevelComplete, foundBonusWords, setFoundBonusWords, clearSelection]);
+  }, [currentWord, currentLevel, foundWords, foundBonusWords, updateGridWithWord, toast, clearSelection, score]);
 
 
   const handleLetterMouseDown = useCallback((index: number) => {
+    if (disabledDraggableInput) return;
     setIsDraggingWord(true);
     setSelectedLetterIndices([index]);
     setCurrentWord(availableLetters[index]);
   }, [availableLetters]);
 
   const handleLetterMouseEnter = useCallback((index: number) => {
-    if (isDraggingWord && !selectedLetterIndices.includes(index)) {
+    if (isDraggingWord && !selectedLetterIndices.includes(index) && !disabledDraggableInput) {
       setSelectedLetterIndices(prev => [...prev, index]);
       setCurrentWord(prev => prev + availableLetters[index]);
     }
   }, [isDraggingWord, selectedLetterIndices, availableLetters]);
+  
+  const disabledDraggableInput = useMemo(() => currentWord.length >= 7, [currentWord]);
 
   useEffect(() => {
     const handleMouseUpGlobal = () => {
       if (isDraggingWord) {
         setIsDraggingWord(false);
-        handleSubmitWord();
+        handleSubmitWord(); // Submit word when dragging stops
       }
     };
-
+  
+    // Add event listeners only when dragging
     if (isDraggingWord) {
       document.addEventListener('mouseup', handleMouseUpGlobal);
       document.addEventListener('touchend', handleMouseUpGlobal);
     }
-
+  
+    // Cleanup function
     return () => {
       document.removeEventListener('mouseup', handleMouseUpGlobal);
       document.removeEventListener('touchend', handleMouseUpGlobal);
     };
-  }, [isDraggingWord, handleSubmitWord]);
+  }, [isDraggingWord, handleSubmitWord]); // Re-run if isDraggingWord or handleSubmitWord changes
 
 
   const handleShuffleLetters = () => {
@@ -226,15 +240,15 @@ export default function HomePage() {
             onLetterMouseDown={handleLetterMouseDown}
             onLetterMouseEnter={handleLetterMouseEnter}
             selectedIndices={selectedLetterIndices}
-            disabled={isDraggingWord && currentWord.length >= 7} // Example max word length
+            disabled={disabledDraggableInput}
           />
           
           <GameControls 
-            onSubmit={handleSubmitWord} // Still useful if we want a manual submit button in the future
+            onSubmit={handleSubmitWord}
             onClear={clearSelection}
             onShuffle={handleShuffleLetters}
             onHint={handleHint}
-            canSubmit={currentWord.length > 0 && !isDraggingWord}
+            canSubmit={currentWord.length > 0 && !isDraggingWord} // Submit button might be less relevant now with drag-release
             isHintDisabled={isHintDisabled}
           />
         </main>
@@ -250,5 +264,3 @@ export default function HomePage() {
     </AnimatePresence>
   );
 }
-
-    
