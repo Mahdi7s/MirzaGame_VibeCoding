@@ -43,6 +43,8 @@ export default function HomePage() {
     return newGrid;
   }, []);
 
+  const disabledDraggableInput = useMemo(() => currentWord.length >= 7, [currentWord]);
+
   useEffect(() => {
     const newLevel = levels[currentLevelIndex];
     setCurrentLevel(newLevel);
@@ -116,13 +118,11 @@ export default function HomePage() {
     } else if (foundWords.has(currentWord) || foundBonusWords.has(currentWord)) {
       toast({ title: "تکراری", description: "این کلمه قبلا پیدا شده.", variant: "destructive", duration: 2000 });
     } else {
-      // This case means the word is in persianWords.ts but not a target/bonus word for this specific level.
       toast({ title: "کلمه معتبر", description: `"${currentWord}" یک کلمه معتبر است، اما جزو کلمات این مرحله نیست.`, variant: "default", duration: 2500 });
     }
     clearSelection();
   }, [currentWord, currentLevel, foundWords, foundBonusWords, updateGridWithWord, toast, clearSelection, score]);
 
-  const disabledDraggableInput = useMemo(() => currentWord.length >= 7, [currentWord]);
 
   const handleLetterMouseDown = useCallback((index: number) => {
     if (disabledDraggableInput) return;
@@ -200,6 +200,24 @@ export default function HomePage() {
     }
   };
 
+  const handleRevealAllWords = () => {
+    setGridState(prevGrid => {
+      const newGrid = prevGrid.map(row => [...row]);
+      currentLevel.targetWords.forEach(wordEntry => {
+        for (let i = 0; i < wordEntry.word.length; i++) {
+          const char = wordEntry.word[i];
+          if (wordEntry.direction === 'horizontal') {
+            newGrid[wordEntry.startY][wordEntry.startX + i] = char;
+          } else {
+            newGrid[wordEntry.startY + i][wordEntry.startX] = char;
+          }
+        }
+      });
+      return newGrid;
+    });
+    toast({ title: "کلمات نمایش داده شدند", description: "تمام کلمات هدف در جدول نشان داده شدند.", duration: 3000 });
+  };
+
   const handleNextLevel = () => {
     if (currentLevelIndex < levels.length - 1) {
       setCurrentLevelIndex(prev => prev + 1);
@@ -246,6 +264,7 @@ export default function HomePage() {
             onClear={clearSelection}
             onShuffle={handleShuffleLetters}
             onHint={handleHint}
+            onRevealWords={handleRevealAllWords}
             canSubmit={currentWord.length > 0 && !isDraggingWord}
             isHintDisabled={isHintDisabled}
           />
