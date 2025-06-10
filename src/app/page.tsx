@@ -17,8 +17,8 @@ type GridCell = string | null;
 
 export default function HomePage() {
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
-  const [currentLevel, setCurrentLevel] = useState<Level>(levels[0]);
-  const [availableLetters, setAvailableLetters] = useState<string[]>(levels[0].letters);
+  const [currentLevel, setCurrentLevel] = useState<Level>(levels[currentLevelIndex]);
+  const [availableLetters, setAvailableLetters] = useState<string[]>(levels[currentLevelIndex].letters);
   
   const [selectedLetterIndices, setSelectedLetterIndices] = useState<number[]>([]);
   const [currentWord, setCurrentWord] = useState("");
@@ -62,7 +62,7 @@ export default function HomePage() {
     document.body.style.backgroundPosition = '';
     document.body.style.backgroundAttachment = '';
 
-  }, [currentLevelIndex, initializeGrid]);
+  }, [currentLevelIndex, initializeGrid, levels]);
 
   const clearSelection = useCallback(() => {
     setSelectedLetterIndices([]);
@@ -116,48 +116,46 @@ export default function HomePage() {
     } else if (foundWords.has(currentWord) || foundBonusWords.has(currentWord)) {
       toast({ title: "تکراری", description: "این کلمه قبلا پیدا شده.", variant: "destructive", duration: 2000 });
     } else {
+      // This case means the word is in persianWords.ts but not a target/bonus word for this specific level.
       toast({ title: "کلمه معتبر", description: `"${currentWord}" یک کلمه معتبر است، اما جزو کلمات این مرحله نیست.`, variant: "default", duration: 2500 });
     }
     clearSelection();
   }, [currentWord, currentLevel, foundWords, foundBonusWords, updateGridWithWord, toast, clearSelection, score]);
 
+  const disabledDraggableInput = useMemo(() => currentWord.length >= 7, [currentWord]);
 
   const handleLetterMouseDown = useCallback((index: number) => {
     if (disabledDraggableInput) return;
     setIsDraggingWord(true);
     setSelectedLetterIndices([index]);
     setCurrentWord(availableLetters[index]);
-  }, [availableLetters]);
+  }, [availableLetters, disabledDraggableInput]);
 
   const handleLetterMouseEnter = useCallback((index: number) => {
     if (isDraggingWord && !selectedLetterIndices.includes(index) && !disabledDraggableInput) {
       setSelectedLetterIndices(prev => [...prev, index]);
       setCurrentWord(prev => prev + availableLetters[index]);
     }
-  }, [isDraggingWord, selectedLetterIndices, availableLetters]);
+  }, [isDraggingWord, selectedLetterIndices, availableLetters, disabledDraggableInput]);
   
-  const disabledDraggableInput = useMemo(() => currentWord.length >= 7, [currentWord]);
-
   useEffect(() => {
     const handleMouseUpGlobal = () => {
       if (isDraggingWord) {
         setIsDraggingWord(false);
-        handleSubmitWord(); // Submit word when dragging stops
+        handleSubmitWord(); 
       }
     };
   
-    // Add event listeners only when dragging
     if (isDraggingWord) {
       document.addEventListener('mouseup', handleMouseUpGlobal);
       document.addEventListener('touchend', handleMouseUpGlobal);
     }
   
-    // Cleanup function
     return () => {
       document.removeEventListener('mouseup', handleMouseUpGlobal);
       document.removeEventListener('touchend', handleMouseUpGlobal);
     };
-  }, [isDraggingWord, handleSubmitWord]); // Re-run if isDraggingWord or handleSubmitWord changes
+  }, [isDraggingWord, handleSubmitWord]);
 
 
   const handleShuffleLetters = () => {
@@ -248,7 +246,7 @@ export default function HomePage() {
             onClear={clearSelection}
             onShuffle={handleShuffleLetters}
             onHint={handleHint}
-            canSubmit={currentWord.length > 0 && !isDraggingWord} // Submit button might be less relevant now with drag-release
+            canSubmit={currentWord.length > 0 && !isDraggingWord}
             isHintDisabled={isHintDisabled}
           />
         </main>
