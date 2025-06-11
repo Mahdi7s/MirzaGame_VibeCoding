@@ -25,22 +25,22 @@ const LevelCompleteDialog: FC<LevelCompleteDialogProps> = ({ isOpen, onNextLevel
 
   return (
     <AlertDialog open={isOpen} onOpenChange={() => {}}>
-      <AlertDialogContent className="font-body">
+      <AlertDialogContent className="font-body max-w-xs sm:max-w-sm">
         <AlertDialogHeader>
-          <div className="flex justify-center mb-4">
-            <PartyPopper className="w-16 h-16 text-primary" />
+          <div className="flex justify-center mb-3">
+            <PartyPopper className="w-14 h-14 sm:w-16 sm:h-16 text-primary" />
           </div>
-          <AlertDialogTitle className="text-2xl font-headline text-center text-primary">
+          <AlertDialogTitle className="text-xl sm:text-2xl font-headline text-center text-primary">
             تبریک! {levelName} تکمیل شد!
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-center text-lg text-foreground/80 py-4">
+          <AlertDialogDescription className="text-center text-base sm:text-lg text-foreground/80 py-3">
             امتیاز شما: <span className="font-bold text-accent">{score}</span>
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="flex flex-col sm:flex-row gap-2 justify-center">
+        <AlertDialogFooter className="flex flex-col gap-2 justify-center pt-2">
           {!isLastLevel ? (
             <AlertDialogAction asChild>
-              <Button onClick={onNextLevel} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button onClick={onNextLevel} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground w-full">
                 <CheckCircle className="ml-2" />
                 مرحله بعد
               </Button>
