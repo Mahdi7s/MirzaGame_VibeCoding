@@ -1,6 +1,7 @@
 
 import React, { type FC } from 'react';
 import type { Level } from '@/data/levels';
+import { cn } from '@/lib/utils';
 
 interface CrosswordGridProps {
   gridState: (string | null)[][];
@@ -30,9 +31,9 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
         className="grid border border-border"
         style={{
           gridTemplateColumns: `repeat(${gridSize.cols}, minmax(0, 1fr))`,
-          width: `${gridSize.cols * cellSizeRem}rem`, 
+          width: `${gridSize.cols * cellSizeRem}rem`,
           height: `${gridSize.rows * cellSizeRem}rem`,
-          direction: 'rtl', 
+          direction: 'rtl',
         }}
       >
         {Array.from({ length: gridSize.rows }).map((_, r) =>
@@ -42,17 +43,23 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
             const letter = gridState[r]?.[c];
             const isHint = revealedHintCells.has(cellKey);
 
+            const cellContent = isActive ? (letter || (isHint && !letter ? '؟' : '')) : '';
+            const cellClassName = cn(
+              "w-full h-full flex items-center justify-center text-xl sm:text-2xl font-bold",
+              isActive
+                ? "bg-input border border-border" // Active word cells
+                : "", // Non-active cells have no specific background or border
+              letter && isActive ? "text-accent animate-celebrate" : "text-transparent",
+              isHint && !letter && isActive ? "bg-primary/20" : "" // Hint placeholder styling for active cells
+            );
+
             return (
               <div
                 key={cellKey}
-                className={`w-full h-full flex items-center justify-center border border-border text-xl sm:text-2xl font-bold
-                  ${isActive ? 'bg-input' : 'bg-muted/70'} /* Changed for dark mode visibility */
-                  ${letter ? 'text-accent animate-celebrate' : 'text-transparent'}
-                  ${isHint && !letter ? 'bg-primary/20' : ''}
-                `}
+                className={cellClassName}
                 style={{ fontSize: `${cellSizeRem * 0.6}rem`}}
               >
-                {letter || (isHint ? '؟' : '')} 
+                {cellContent}
               </div>
             );
           })
