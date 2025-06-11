@@ -44,13 +44,14 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
             const isHint = revealedHintCells.has(cellKey);
 
             const cellContent = isActive ? (letter || (isHint && !letter ? '؟' : '')) : '';
+            
             const cellClassName = cn(
               "w-full h-full flex items-center justify-center text-xl sm:text-2xl font-bold",
               isActive
-                ? "bg-input border border-border" // Active word cells
+                ? "bg-input border border-primary/60" // Active cells: dark input bg with glowing primary border
                 : "", // Non-active cells have no specific background or border
-              letter && isActive ? "text-accent animate-celebrate" : "text-transparent",
-              isHint && !letter && isActive ? "bg-primary/20" : "" // Hint placeholder styling for active cells
+              letter && isActive ? "text-accent animate-celebrate" : "text-transparent", // Filled letters are deep red
+              isHint && !letter && isActive ? "bg-primary/20 text-primary" : "" // Hint placeholder '؟' styling: light primary bg, primary text
             );
 
             return (
