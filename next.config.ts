@@ -6,10 +6,8 @@ const repoName = process.env.REPO_NAME || '';
 
 const nextConfig: NextConfig = {
   output: 'export',
-  // Set basePath and assetPrefix if deploying to a subdirectory like username.github.io/repo-name
-  // If deploying to username.github.io (a user/org site), these can be empty strings or removed.
-  basePath: repoName ? `/${repoName}` : '',
-  assetPrefix: repoName ? `/${repoName}/` : '',
+  // basePath: repoName ? `/${repoName}` : '', // REMOVED: GitHub Pages handles the subpath via the repo name. This caused index.html to be in a subfolder within the 'out' dir.
+  assetPrefix: repoName ? `/${repoName}/` : '', // ESSENTIAL: Ensures assets are loaded correctly from the subpath.
   images: {
     unoptimized: true, // Required for static export as image optimization needs a server
     remotePatterns: [
