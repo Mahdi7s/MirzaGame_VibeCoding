@@ -1,73 +1,57 @@
 
 import React, { type FC } from 'react';
-import type { Level } from '@/data/levels';
+import type { Level, CrosswordEntry } from '@/data/levels';
 import { cn } from '@/lib/utils';
 
 interface CrosswordGridProps {
-  gridState: (string | null)[][];
-  gridSize: Level['gridSize'];
   targetWords: Level['targetWords'];
-  revealedHintCells: Set<string>; 
+  filledLetters: Map<string, (string | null)[]>;
+  hintedIndices: Map<string, Set<number>>;
 }
 
-const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWords, revealedHintCells }) => {
-  const activeCells = React.useMemo(() => {
-    const cells = new Set<string>();
-    targetWords.forEach(entry => {
-      for (let i = 0; i < entry.word.length; i++) {
-        const r = entry.startY + (entry.direction === 'vertical' ? i : 0);
-        const c = entry.startX + (entry.direction === 'horizontal' ? i : 0);
-        cells.add(`${r}-${c}`);
-      }
-    });
-    return cells;
-  }, [targetWords]);
-
-  const cellSizeRem = Math.min(3, 25 / Math.max(gridSize.cols, gridSize.rows));
-
+const CrosswordGrid: FC<CrosswordGridProps> = ({ targetWords, filledLetters, hintedIndices }) => {
   return (
-    <div className="flex justify-center items-center p-1 rounded-lg">
-      <div
-        className="grid" 
-        style={{
-          gridTemplateColumns: `repeat(${gridSize.cols}, minmax(0, 1fr))`,
-          width: `${gridSize.cols * cellSizeRem}rem`,
-          height: `${gridSize.rows * cellSizeRem}rem`,
-          direction: 'rtl',
-        }}
-      >
-        {Array.from({ length: gridSize.rows }).map((_, r) =>
-          Array.from({ length: gridSize.cols }).map((_, c) => {
-            const cellKey = `${r}-${c}`;
-            const isActive = activeCells.has(cellKey);
-            const letter = gridState[r]?.[c];
-            const isHint = revealedHintCells.has(cellKey) && !letter;
+    <div className="flex flex-wrap justify-center items-start gap-4 p-2 my-4">
+      {targetWords.map((wordEntry, wordIdx) => {
+        const lettersForThisWord = filledLetters.get(wordEntry.word) || Array(wordEntry.word.length).fill(null);
+        const hintsForThisWord = hintedIndices.get(wordEntry.word) || new Set();
 
-            const cellContent = isActive ? (letter || (isHint ? '؟' : '')) : '';
-            
-            const cellClassName = cn(
-              "w-full h-full flex items-center justify-center text-xl sm:text-2xl font-bold",
-              isActive
-                ? "bg-input border border-primary/60" 
-                : "bg-transparent border-transparent", 
-              letter && isActive ? "text-primary animate-celebrate" : "text-transparent",
-              isHint && isActive ? "bg-primary/20 text-primary" : "" 
-            );
-
-            return (
-              <div
-                key={cellKey}
-                className={cellClassName}
-                style={{ fontSize: `${cellSizeRem * 0.6}rem`}}
-              >
-                {cellContent}
-              </div>
-            );
-          })
-        )}
-      </div>
+        return (
+          <div
+            key={`${wordEntry.word}-${wordIdx}`}
+            className={cn(
+              "flex rounded", // Add rounded to the word block itself
+              wordEntry.direction === 'horizontal' ? 'flex-row' : 'flex-col',
+              'gap-0.5' // Small gap between cells of the same word
+            )}
+            aria-label={`کلمه ${wordEntry.word}`}
+          >
+            {wordEntry.word.split('').map((char, letterIdx) => {
+              const letterToShow = lettersForThisWord[letterIdx];
+              const isHintedAndEmpty = hintsForThisWord.has(letterIdx) && !letterToShow;
+              
+              return (
+                <div
+                  key={`${wordEntry.word}-${wordIdx}-${letterIdx}`}
+                  className={cn(
+                    "w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-xl sm:text-2xl font-bold",
+                    "bg-input border border-primary/60 rounded-sm", // Apply to all cells in a word block
+                    letterToShow ? "text-primary animate-celebrate" : "text-transparent",
+                    isHintedAndEmpty ? "text-primary bg-primary/20" : ""
+                  )}
+                  style={{ fontSize: `1.5rem`}} // Fixed font size for cells
+                >
+                  {letterToShow || (isHintedAndEmpty ? '؟' : '')}
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 };
 
 export default CrosswordGrid;
+
+    
