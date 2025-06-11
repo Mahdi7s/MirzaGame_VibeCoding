@@ -15,8 +15,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 type GridCell = string | null;
 
+const LOCAL_STORAGE_LEVEL_KEY = 'aghaMirzaCurrentLevelIndex';
+
 export default function HomePage() {
-  const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
+  const [currentLevelIndex, setCurrentLevelIndex] = useState<number>(0);
+  const [isInitialLoadComplete, setIsInitialLoadComplete] = useState<boolean>(false);
+  
   const [currentLevel, setCurrentLevel] = useState<Level>(levels[currentLevelIndex]);
   const [availableLetters, setAvailableLetters] = useState<string[]>(levels[currentLevelIndex].letters);
   
@@ -38,6 +42,27 @@ export default function HomePage() {
 
   const disabledDraggableInput = useMemo(() => currentWord.length >= 7, [currentWord]);
 
+  // Load saved level from localStorage on initial mount
+  useEffect(() => {
+    const savedLevelIndexStr = localStorage.getItem(LOCAL_STORAGE_LEVEL_KEY);
+    if (savedLevelIndexStr) {
+      const savedLevelIndex = parseInt(savedLevelIndexStr, 10);
+      if (!isNaN(savedLevelIndex) && savedLevelIndex >= 0 && savedLevelIndex < levels.length) {
+        setCurrentLevelIndex(savedLevelIndex);
+      } else {
+        setCurrentLevelIndex(0); // Default to 0 if saved index is invalid
+      }
+    }
+    setIsInitialLoadComplete(true);
+  }, []); // Runs only once on mount
+
+  // Save currentLevelIndex to localStorage whenever it changes, after initial load
+  useEffect(() => {
+    if (isInitialLoadComplete) {
+      localStorage.setItem(LOCAL_STORAGE_LEVEL_KEY, currentLevelIndex.toString());
+    }
+  }, [currentLevelIndex, isInitialLoadComplete]);
+
   const initializeGrid = useCallback((level: Level): GridCell[][] => {
     const newGrid = Array(level.gridSize.rows)
       .fill(null)
@@ -46,24 +71,25 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    const newLevel = levels[currentLevelIndex];
-    setCurrentLevel(newLevel);
-    setAvailableLetters([...newLevel.letters].sort(() => Math.random() - 0.5));
-    setGridState(initializeGrid(newLevel));
-    setFoundWords(new Set());
-    setFoundBonusWords(new Set());
-    setSelectedLetterIndices([]);
-    setCurrentWord("");
-    setIsLevelComplete(false);
-    setHintsUsedThisLevel(0);
-    setRevealedHintCells(new Set());
-    setIsDraggingWord(false);
-    
-    document.body.style.backgroundImage = ''; 
-    document.body.style.backgroundSize = '';
-    document.body.style.backgroundPosition = '';
-    document.body.style.backgroundAttachment = '';
-
+    if(levels[currentLevelIndex]) {
+      const newLevel = levels[currentLevelIndex];
+      setCurrentLevel(newLevel);
+      setAvailableLetters([...newLevel.letters].sort(() => Math.random() - 0.5));
+      setGridState(initializeGrid(newLevel));
+      setFoundWords(new Set());
+      setFoundBonusWords(new Set());
+      setSelectedLetterIndices([]);
+      setCurrentWord("");
+      setIsLevelComplete(false);
+      setHintsUsedThisLevel(0);
+      setRevealedHintCells(new Set());
+      setIsDraggingWord(false);
+      
+      document.body.style.backgroundImage = ''; 
+      document.body.style.backgroundSize = '';
+      document.body.style.backgroundPosition = '';
+      document.body.style.backgroundAttachment = '';
+    }
   }, [currentLevelIndex, initializeGrid, levels]); 
 
   const clearSelection = useCallback(() => {
@@ -78,9 +104,9 @@ export default function HomePage() {
       for (let i = 0; i < wordEntry.word.length; i++) {
         const char = wordEntry.word[i];
         if (wordEntry.direction === 'horizontal') {
-          newGrid[wordEntry.startY][wordEntry.startX + i] = char;
+          if(newGrid[wordEntry.startY] !== undefined) newGrid[wordEntry.startY][wordEntry.startX + i] = char;
         } else {
-          newGrid[wordEntry.startY + i][wordEntry.startX] = char;
+          if(newGrid[wordEntry.startY + i] !== undefined) newGrid[wordEntry.startY + i][wordEntry.startX] = char;
         }
       }
       return newGrid;
@@ -118,10 +144,11 @@ export default function HomePage() {
     } else if (foundWords.has(currentWord) || foundBonusWords.has(currentWord)) {
       toast({ title: "تکراری", description: "این کلمه قبلا پیدا شده.", variant: "destructive", duration: 2000 });
     } else {
-      toast({ title: "کلمه معتبر", description: `"${currentWord}" یک کلمه معتبر است، اما جزو کلمات این مرحله نیست.`, variant: "default", duration: 2500 });
+      // It's a valid Persian word, but not for this level
+      // toast({ title: "کلمه معتبر", description: `"${currentWord}" یک کلمه معتبر است، اما جزو کلمات این مرحله نیست.`, variant: "default", duration: 2500 });
     }
     clearSelection();
-  }, [currentWord, currentLevel, foundWords, foundBonusWords, updateGridWithWord, toast, clearSelection]);
+  }, [currentWord, currentLevel, foundWords, foundBonusWords, updateGridWithWord, toast, clearSelection, score]);
 
 
   const handleLetterMouseDown = useCallback((index: number) => {
@@ -181,10 +208,10 @@ export default function HomePage() {
       const r = wordToHint.startY + (wordToHint.direction === 'vertical' ? i : 0);
       const c = wordToHint.startX + (wordToHint.direction === 'horizontal' ? i : 0);
       const cellKey = `${r}-${c}`;
-      if (!gridState[r]?.[c] && !revealedHintCells.has(cellKey)) {
+      if (gridState[r]?.[c] === null && !revealedHintCells.has(cellKey)) {
         setGridState(prevGrid => {
           const newGrid = prevGrid.map(row => [...row]);
-          newGrid[r][c] = wordToHint.word[i];
+          if(newGrid[r] !== undefined) newGrid[r][c] = wordToHint.word[i];
           return newGrid;
         });
         setRevealedHintCells(prev => new Set(prev).add(cellKey));
@@ -196,7 +223,7 @@ export default function HomePage() {
       }
     }
     if (!revealed) {
-         toast({ title: "خطای راهنما", description: "امکان نمایش راهنمای بیشتر برای این کلمه نیست. سعی کنید کلمه دیگری را حل کنید", variant: "destructive" });
+         toast({ title: "خطای راهنما", description: "امکان نمایش راهنمای بیشتر برای این کلمه نیست. سعی کنید کلمه دیگری را حل کنید یا کلمات موجود تکمیل شده اند.", variant: "destructive" });
     }
   };
 
@@ -205,11 +232,22 @@ export default function HomePage() {
       setCurrentLevelIndex(prev => prev + 1);
     } else {
       toast({ title: "پایان بازی!", description: "شما تمام مراحل را با موفقیت به پایان رساندید!" });
+      setCurrentLevelIndex(0); // Reset to level 0 after completing all levels
     }
     setIsLevelComplete(false);
   };
   
-  const isHintDisabled = useMemo(() => hintsUsedThisLevel >= MAX_HINTS_PER_LEVEL || foundWords.size === currentLevel.targetWords.length, [hintsUsedThisLevel, foundWords.size, currentLevel.targetWords.length]);
+  const isHintDisabled = useMemo(() => hintsUsedThisLevel >= MAX_HINTS_PER_LEVEL || (currentLevel && foundWords.size === currentLevel.targetWords.length), [hintsUsedThisLevel, foundWords.size, currentLevel]);
+
+  if (!currentLevel) {
+    // This can happen briefly if currentLevelIndex is updated before newLevel is set
+    // or if currentLevelIndex is out of bounds (e.g. after localStorage load before validation)
+    return (
+        <div className="min-h-screen flex flex-col items-center justify-center p-2 sm:p-3 container mx-auto font-body">
+            در حال بارگذاری مرحله...
+        </div>
+    );
+  }
 
   return (
     <AnimatePresence>
@@ -267,3 +305,4 @@ export default function HomePage() {
     </AnimatePresence>
   );
 }
+
