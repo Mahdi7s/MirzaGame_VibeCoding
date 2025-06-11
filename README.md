@@ -1,3 +1,4 @@
+
 # Firebase Studio - آغامیرزا
 
 This is a NextJS starter game "آغامیرزا" (Agha Mirza) in Firebase Studio.

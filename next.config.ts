@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 // This will be set by the GitHub Actions workflow from GITHUB_REPOSITORY
