@@ -26,7 +26,7 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
   const cellSizeRem = Math.min(3, 25 / Math.max(gridSize.cols, gridSize.rows));
 
   return (
-    <div className="flex justify-center items-center p-1 rounded-lg shadow-inner" dir="rtl">
+    <div className="flex justify-center items-center p-1 rounded-lg"> {/* Removed shadow-inner */}
       <div
         className="grid border border-border"
         style={{
@@ -48,10 +48,10 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
             const cellClassName = cn(
               "w-full h-full flex items-center justify-center text-xl sm:text-2xl font-bold",
               isActive
-                ? "bg-input border border-primary/60" // Active cells: dark input bg with glowing primary border
-                : "", // Non-active cells have no specific background or border
-              letter && isActive ? "text-accent animate-celebrate" : "text-transparent", // Filled letters are deep red
-              isHint && !letter && isActive ? "bg-primary/20 text-primary" : "" // Hint placeholder '؟' styling: light primary bg, primary text
+                ? "bg-input border border-primary/60" 
+                : "", 
+              letter && isActive ? "text-primary animate-celebrate" : "text-transparent", // Changed text-accent to text-primary
+              isHint && !letter && isActive ? "bg-primary/20 text-primary" : "" 
             );
 
             return (
