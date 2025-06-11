@@ -17,10 +17,9 @@ type GridCell = string | null;
 
 const LOCAL_STORAGE_LEVEL_KEY = 'aghaMirzaCurrentLevelIndex';
 
-// Helper function to play sounds
 const playSound = (soundFile: string) => {
   try {
-    const audio = new Audio(soundFile);
+    const audio = new Audio(soundFile); // Note: For GitHub Pages, paths should be relative to the deployment root
     audio.play().catch(error => console.error("Error playing sound:", soundFile, error));
   } catch (error) {
     console.error("Error creating audio element for:", soundFile, error);
@@ -99,11 +98,6 @@ export default function HomePage() {
       setHintsUsedThisLevel(0);
       setRevealedHintCells(new Set());
       setIsDraggingWord(false);
-      
-      document.body.style.backgroundImage = ''; 
-      document.body.style.backgroundSize = '';
-      document.body.style.backgroundPosition = '';
-      document.body.style.backgroundAttachment = '';
     }
   }, [currentLevelIndex, initializeGrid]); 
 
@@ -133,7 +127,6 @@ export default function HomePage() {
 
     const normalizedCurrentWord = normalizeAlef(currentWord);
 
-    // 1. Check Target Words
     const targetWordEntry = currentLevel.targetWords.find(
       (entry) => normalizeAlef(entry.word) === normalizedCurrentWord
     );
@@ -143,13 +136,13 @@ export default function HomePage() {
         const newFoundWords = new Set(foundWords).add(targetWordEntry.word);
         setFoundWords(newFoundWords);
         setScore((prev) => prev + targetWordEntry.word.length * 10);
-        updateGridWithWord(targetWordEntry); // Use original entry to fill grid
+        updateGridWithWord(targetWordEntry);
         toast({ title: "عالی!", description: `کلمه "${targetWordEntry.word}" پیدا شد!`, variant: "default", duration: 2000 });
-        playSound('/sounds/correct-word.mp3');
+        playSound('sounds/correct-word.mp3');
         
         if (newFoundWords.size === currentLevel.targetWords.length) {
           setIsLevelComplete(true);
-          playSound('/sounds/level-complete.mp3');
+          playSound('sounds/level-complete.mp3');
           setScore((prev) => prev + 50); 
         }
       } else {
@@ -159,7 +152,6 @@ export default function HomePage() {
       return;
     }
 
-    // 2. Check Bonus Words
     const bonusWordDef = currentLevel.bonusWords.find(
       (bw) => normalizeAlef(bw) === normalizedCurrentWord
     );
@@ -169,31 +161,29 @@ export default function HomePage() {
         setFoundBonusWords((prev) => new Set(prev).add(bonusWordDef));
         setScore((prev) => prev + bonusWordDef.length * 5);
         toast({ title: "جایزه!", description: `کلمه اضافه "${bonusWordDef}" پیدا شد!`, variant: "default", duration: 2000 });
-        playSound('/sounds/correct-word.mp3');
+        playSound('sounds/correct-word.mp3');
       } else {
         toast({ title: "تکراری", description: "این کلمه قبلا پیدا شده.", variant: "destructive", duration: 2000 });
       }
       clearSelection();
       return;
     }
-
-    // 3. If not target or bonus
-    const isGenerallyValid = persianWords.has(currentWord) || (currentWord.includes('ا') && persianWords.has(currentWord.replace(/ا/g, 'آ')));
+    
+    const isGenerallyValid = persianWords.has(currentWord) || persianWords.has(currentWord.replace(/ا/g, 'آ'));
 
     if (!isGenerallyValid) {
         toast({ title: "کلمه نامعتبر", description: `"${currentWord}" در لغت‌نامه یافت نشد.`, variant: "destructive", duration: 2000 });
     } else {
-        // It's a valid Persian word, but not part of this specific puzzle
         toast({ title: "یافت نشد", description: `"${currentWord}" جزو کلمات این مرحله نیست.`, variant: "destructive", duration: 2000 });
     }
 
     clearSelection();
-  }, [currentWord, currentLevel, foundWords, foundBonusWords, updateGridWithWord, toast, clearSelection, score]);
+  }, [currentWord, currentLevel, foundWords, foundBonusWords, updateGridWithWord, toast, clearSelection]);
 
 
   const handleLetterMouseDown = useCallback((index: number) => {
     if (disabledDraggableInput) return;
-    playSound('/sounds/letter-drag.mp3');
+    playSound('sounds/letter-drag.mp3');
     setIsDraggingWord(true);
     setSelectedLetterIndices([index]);
     setCurrentWord(availableLetters[index]);
@@ -252,7 +242,7 @@ export default function HomePage() {
       if (gridState[r]?.[c] === null && !revealedHintCells.has(cellKey)) {
         setGridState(prevGrid => {
           const newGrid = prevGrid.map(row => [...row]);
-          if(newGrid[r] !== undefined) newGrid[r][c] = wordToHint.word[i]; // Use original char from wordToHint
+          if(newGrid[r] !== undefined) newGrid[r][c] = wordToHint.word[i];
           return newGrid;
         });
         setRevealedHintCells(prev => new Set(prev).add(cellKey));
@@ -264,7 +254,7 @@ export default function HomePage() {
       }
     }
     if (!revealed) {
-         toast({ title: "خطای راهنما", description: "امکان نمایش راهنمای بیشتر برای این کلمه نیست. سعی کنید کلمه دیگری را حل کنید یا کلمات موجود تکمیل شده اند.", variant: "destructive" });
+         toast({ title: "خطای راهنما", description: "امکان نمایش راهنمای بیشتر برای این کلمه نیست.", variant: "destructive" });
     }
   };
 
@@ -301,7 +291,7 @@ export default function HomePage() {
         <GameHeader levelName={currentLevel.name} score={score} />
         
         <main className="flex-grow flex flex-col items-center justify-start w-full max-w-2xl mt-1">
-          <div className="mt-2 mb-1 w-full"> {/* Adjusted margins */}
+          <div className="mt-2 mb-1 w-full">
             <CrosswordGrid 
               gridState={gridState} 
               gridSize={currentLevel.gridSize}
@@ -310,11 +300,11 @@ export default function HomePage() {
             />
           </div>
           
-          <div className="my-0 w-full"> {/* Adjusted margins */}
+          <div className="my-0 w-full">
             <CurrentWordDisplay word={currentWord} />
           </div>
           
-          <div className="mt-2 mb-1 w-full"> {/* Adjusted margins */}
+          <div className="mt-2 mb-1 w-full">
             <LetterCircle 
               letters={availableLetters} 
               onLetterMouseDown={handleLetterMouseDown}
@@ -324,7 +314,7 @@ export default function HomePage() {
             />
           </div>
           
-          <div className="mt-1 w-full"> {/* Adjusted margins */}
+          <div className="mt-1 w-full">
             <GameControls 
               onShuffle={handleShuffleLetters}
               onHint={handleHint}

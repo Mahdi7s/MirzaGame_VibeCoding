@@ -1,17 +1,5 @@
 
-/**
- * @fileOverview Contains a list of distinct Persian words.
- * This file should be populated with words from the provided database.
- * Example: https://github.com/shahind/Persian-Words-Database/blob/master/distinct_words.txt
- *
- * IMPORTANT: Due to limitations, this file is initialized with a small sample.
- * Please replace the sample content with the full list of Persian words for comprehensive validation.
- * Simply copy the content of distinct_words.txt and paste it between the square brackets,
- * with each word enclosed in quotes and separated by a comma.
- */
-
 export const persianWords: Set<string> = new Set([
-  // Sample words - REPLACE WITH FULL LIST FROM THE GITHUB LINK
   "ابر", "انار", "بار", "ربا", "ران", "بنا", "ناب", "انبر",
   "سیب", "بام", "آسیا", "سام", "بیم", "آبی", "مهر", "ماه", "سهم", "شبیه", "شیر",
   "کتاب", "کف", "بک", "شال", "قفل", "ادب", "دقت", "فدا", "لشک",
@@ -20,18 +8,26 @@ export const persianWords: Set<string> = new Set([
   "ایران", "تهران", "شیراز", "اصفهان", "تبریز", "یزد", "کرمان", "رشت", "وطن",
   "روز", "شب", "دل",
 
-  // Words for levels 1-11 (Target & Bonus)
-  "نبات", "تب", "تن", "بت", "بان", "تا", "آن", "نت", "نبأ", "تاب",
+  // Level 1
+  "نبات", "تب", "تن", "بت", "بان", "تا", "آن", "نت", "نبأ", "تاب", "بنا",
+  // Level 2
   "برنج", "رنج", "برج", "جن", "رج", "رب", "بر", "بن",
+  // Level 3
   "تمشک", "مشک", "شکم", "تشک", "شک", "مت", "کشت", "شم",
+  // Level 4
   "ترمز", "رمز", "رزم", "مرز", "رز", "رم", "مر", "تر", "تم",
+  // Level 5
   "ریال", "ریل", "یار", "یل", "ری", "ایر", "لای", "آری",
+  // Level 6
   "کلمه", "ملکه", "کلم", "ملک", "کل", "لک", "هم", "مه", "که",
-  "پاکت", "پاک", "پتک", "پک", "تک", "تاپ", "کات",
+  // Level 7
+  "پاکت", "پاک", "پتک", "پک", "تک", "تاپ", "کات", "تپ",
+  // Level 8
   "نقره", "هنر", "رهن", "قرن", "نهر", "ره", "نه", "رق", "نق", "قر", "هن",
-  "بالش", "بال", "بلا", "لب", "آش", "بل", "لاش",
+  // Level 9
+  "بالش", "بال", "بلا", "شال", "لب", "آش", "بل", "لاش",
+  // Level 10
   "کاهو", "کاوه", "آهک", "کوه", "کاه", "آه", "کاو", "آوا", "وه", "هو", "ها",
+  // Level 11
   "خمیر", "مریخ", "میخ", "خیر", "خم", "رخ", "ری", "خی", "مر",
-
-  // Add many more words here...
 ]);

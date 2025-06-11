@@ -7,7 +7,7 @@ interface CurrentWordDisplayProps {
 
 const CurrentWordDisplay: FC<CurrentWordDisplayProps> = ({ word }) => {
   return (
-    <div className="p-1 h-10 rounded-lg shadow text-center flex items-center justify-center"> {/* Removed bg-background */}
+    <div className="p-1 h-10 rounded-lg shadow text-center flex items-center justify-center bg-transparent">
       <span className="text-xl sm:text-2xl font-headline font-semibold text-primary tracking-wider">
         {word || ''}
       </span>

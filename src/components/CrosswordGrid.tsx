@@ -7,7 +7,7 @@ interface CrosswordGridProps {
   gridState: (string | null)[][];
   gridSize: Level['gridSize'];
   targetWords: Level['targetWords'];
-  revealedHintCells: Set<string>; // "row-col"
+  revealedHintCells: Set<string>; 
 }
 
 const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWords, revealedHintCells }) => {
@@ -26,9 +26,9 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
   const cellSizeRem = Math.min(3, 25 / Math.max(gridSize.cols, gridSize.rows));
 
   return (
-    <div className="flex justify-center items-center p-1 rounded-lg"> {/* Removed shadow-inner */}
+    <div className="flex justify-center items-center p-1 rounded-lg">
       <div
-        className="grid border border-border"
+        className="grid" 
         style={{
           gridTemplateColumns: `repeat(${gridSize.cols}, minmax(0, 1fr))`,
           width: `${gridSize.cols * cellSizeRem}rem`,
@@ -41,17 +41,17 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
             const cellKey = `${r}-${c}`;
             const isActive = activeCells.has(cellKey);
             const letter = gridState[r]?.[c];
-            const isHint = revealedHintCells.has(cellKey);
+            const isHint = revealedHintCells.has(cellKey) && !letter;
 
-            const cellContent = isActive ? (letter || (isHint && !letter ? '؟' : '')) : '';
+            const cellContent = isActive ? (letter || (isHint ? '؟' : '')) : '';
             
             const cellClassName = cn(
               "w-full h-full flex items-center justify-center text-xl sm:text-2xl font-bold",
               isActive
                 ? "bg-input border border-primary/60" 
-                : "", 
-              letter && isActive ? "text-primary animate-celebrate" : "text-transparent", // Changed text-accent to text-primary
-              isHint && !letter && isActive ? "bg-primary/20 text-primary" : "" 
+                : "bg-transparent border-transparent", 
+              letter && isActive ? "text-primary animate-celebrate" : "text-transparent",
+              isHint && isActive ? "bg-primary/20 text-primary" : "" 
             );
 
             return (

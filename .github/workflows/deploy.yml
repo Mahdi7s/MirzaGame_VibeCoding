@@ -5,7 +5,7 @@ name: Deploy Next.js site to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["master"] # Changed from "main" to "master"
+    branches: ["master"] # Ensure this matches your default branch name
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -32,23 +32,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18" # Specify your Node.js version
+          node-version: "18" 
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
       - name: Build Next.js app
         run: |
-          # Extract repository name from GITHUB_REPOSITORY (e.g., "owner/repo-name" -> "repo-name")
-          # This is passed to next.config.js for basePath and assetPrefix
-          REPO_NAME_VAR=${GITHUB_REPOSITORY#*/}
-          echo "REPO_NAME_VAR for build: $REPO_NAME_VAR"
           npm run build
         env:
           REPO_NAME: ${{ github.event.repository.name }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
           path: ./out
 
   # Deployment job

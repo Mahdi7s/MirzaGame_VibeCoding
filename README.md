@@ -1,17 +1,27 @@
 
-# Firebase Studio - آغامیرزا
+# واژه بهشت (Vāژه Behesht - Word Paradise)
 
-This is a NextJS starter game "آغامیرزا" (Agha Mirza) in Firebase Studio.
+This is a Next.js Persian word game inspired by "Agha Mirza", built in Firebase Studio. The game challenges players to form words from a circle of letters to fill a crossword grid.
 
-To get started, take a look at `src/app/page.tsx`.
+## Features
+
+-   **Letter Circle**: Connect Persian letters to form words.
+-   **Crossword Grid**: Fill words into a crossword-style grid.
+-   **Levels**: Progress through 11 unique levels with increasing difficulty.
+-   **Scoring**: Earn points for finding target words and bonus words.
+-   **Hint System**: Get help by revealing a letter in the grid.
+-   **Dark Theme**: Enjoy a visually comfortable dark mode interface.
+-   **Responsive Design**: Playable on various screen sizes.
+-   **Sound Effects**: Audio feedback for game actions.
+-   **"B Titr" Font**: Styled with the "B Titr" Persian font (requires local installation or web font hosting).
 
 ## Running Locally
 
-1.  Install dependencies:
+1.  **Install dependencies**:
     ```bash
     npm install
     ```
-2.  Run the development server:
+2.  **Run the development server**:
     ```bash
     npm run dev
     ```
@@ -19,29 +29,24 @@ To get started, take a look at `src/app/page.tsx`.
 
 ## Deployment to GitHub Pages
 
-This project is configured for static export and can be deployed to GitHub Pages for free.
+This project is configured for static export and can be deployed to GitHub Pages.
 
 ### Prerequisites
 
 1.  Push your code to a GitHub repository.
-2.  The `.github/workflows/deploy.yml` file (included in this project) will automatically build and deploy your site when you push to the `main` branch (or your default branch as specified in the workflow file).
+2.  The `.github/workflows/deploy.yml` file (included) will automatically build and deploy your site when you push to the `master` branch (or your default branch as specified in the workflow).
 
 ### Setup in GitHub Repository
 
-1.  After the workflow runs successfully for the first time (check the "Actions" tab in your GitHub repository), go to your repository's **Settings**.
+1.  After the workflow runs successfully for the first time (check the "Actions" tab), go to your repository's **Settings**.
 2.  In the left sidebar, click on **Pages**.
-3.  Under "Build and deployment", for the "Source", select **GitHub Actions**.
-4.  GitHub Pages will provide you with the URL where your site is published. It will typically be in the format: `https://<your-username>.github.io/<your-repository-name>/`.
+3.  Under "Build and deployment", for the **Source**, select **GitHub Actions**.
+4.  GitHub Pages will provide the URL where your site is published (e.g., `https://<your-username>.github.io/<your-repository-name>/`).
 
 ### How it Works
 
-*   The `next.config.ts` file is configured with `output: 'export'` to generate a static site.
-*   It also dynamically sets `basePath` and `assetPrefix` based on your repository name. This is crucial for assets (like CSS, JavaScript, images, sounds) to load correctly when the site is served from a subpath (e.g., `/<repository-name>/`).
-*   The GitHub Actions workflow in `.github/workflows/deploy.yml` handles:
-    *   Checking out your code.
-    *   Setting up Node.js.
-    *   Installing dependencies.
-    *   Building the Next.js application (which creates static files in an `out` directory).
-    *   Deploying the contents of the `out` directory to GitHub Pages.
+*   `next.config.ts` is configured with `output: 'export'`.
+*   `assetPrefix` in `next.config.ts` ensures assets load correctly from the repository's subpath on GitHub Pages. `basePath` is intentionally omitted as GitHub Pages handles the subpath.
+*   The GitHub Actions workflow in `.github/workflows/deploy.yml` builds the Next.js app (outputting to the `out` directory) and deploys it.
 
-Your game should now be deployable to GitHub Pages!
+Enjoy playing واژه بهشت!

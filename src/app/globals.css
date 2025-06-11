@@ -4,30 +4,44 @@
 @tailwind utilities;
 
 body {
-  font-family: 'B Titr', serif; /* Changed to B Titr */
+  font-family: 'B Titr', serif;
 }
 
 @layer base {
   :root {
-    --background: 0 0% 3.9%; /* Dark background */
-    --foreground: 0 0% 98%; /* Light foreground */
-    --card: 0 0% 3.9%; /* Match dark background */
+    /* Dark Theme as default, per Vāژه Behesht Style Guidelines adapted for dark mode */
+    /* Primary: Golden Yellow (#D4AF37) -> HSL: ~45, 66%, 52% */
+    /* Background: Very light beige (#F5F5DC) -> For dark: a very dark, near-black, slightly desaturated color */
+    /* Accent: Deep Red (#A7212A) -> HSL: ~356, 65%, 39% */
+
+    --background: 220 10% 3.9%; /* Very dark blueish-grey */
+    --foreground: 0 0% 98%; /* Light foreground for contrast */
+    
+    --card: 220 10% 6%; /* Slightly lighter than background */
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%; /* Match dark background */
+    
+    --popover: 220 10% 6%;
     --popover-foreground: 0 0% 98%;
+    
     --primary: 45 66% 52%; /* Golden Yellow */
-    --primary-foreground: 0 0% 10%; /* Dark text on golden yellow */
-    --secondary: 0 0% 10%; /* Darker secondary for dark mode */
+    --primary-foreground: 60 96% 10%; /* Dark, slightly desaturated yellow/brown for text on golden yellow */
+    
+    --secondary: 220 10% 10%; /* Darker secondary for dark mode */
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 8%; /* Darker muted for dark mode */
+    
+    --muted: 220 10% 8%; /* Darker muted for dark mode */
     --muted-foreground: 0 0% 63.9%;
+    
     --accent: 356 65% 39%; /* Deep Red */
     --accent-foreground: 0 0% 98%; /* Light text on deep red */
+    
     --destructive: 0 62.8% 30.6%; /* Adjusted for dark theme */
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%; /* Subtle border for dark mode */
-    --input: 0 0% 14.9%; /* Input color for dark mode */
+    
+    --border: 220 10% 14.9%; /* Subtle border for dark mode */
+    --input: 220 10% 11%; /* Input color for dark mode, slightly lighter than background */
     --ring: 45 66% 52%; /* Golden yellow for rings */
+    
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -35,7 +49,7 @@ body {
     --chart-5: 340 75% 55%;
     --radius: 0.5rem;
 
-    /* Sidebar variables remain, assuming they are mostly for a potentially light sidebar on a dark app, or a configurable sidebar */
+    /* Sidebar variables (can be kept as is or adjusted if a distinct sidebar theme is desired) */
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -47,25 +61,25 @@ body {
   }
 
   .dark {
-    /* Keeping .dark consistent with :root now, or could define a light theme here if needed */
-    --background: 0 0% 3.9%;
+    /* .dark class can be identical to :root for a default dark theme */
+    --background: 220 10% 3.9%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
+    --card: 220 10% 6%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
+    --popover: 220 10% 6%;
     --popover-foreground: 0 0% 98%;
     --primary: 45 66% 52%;
-    --primary-foreground: 0 0% 10%;
-    --secondary: 0 0% 10%;
+    --primary-foreground: 60 96% 10%;
+    --secondary: 220 10% 10%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 8%;
+    --muted: 220 10% 8%;
     --muted-foreground: 0 0% 63.9%;
     --accent: 356 65% 39%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
+    --border: 220 10% 14.9%;
+    --input: 220 10% 11%;
     --ring: 45 66% 52%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -89,7 +103,6 @@ body {
   }
   body {
     @apply bg-background text-foreground;
-     /* font-family is now set directly above, outside @layer base for higher specificity if needed */
   }
 }
 

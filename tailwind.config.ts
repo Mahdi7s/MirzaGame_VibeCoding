@@ -11,8 +11,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['"B Titr"', 'serif'], // Changed to B Titr
-        headline: ['"B Titr"', 'serif'], // Changed to B Titr
+        body: ['"B Titr"', 'serif'],
+        headline: ['"B Titr"', 'serif'],
         code: ['monospace'],
       },
       colors: {

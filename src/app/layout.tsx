@@ -4,8 +4,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'آغامیرزا',
-  description: 'یک بازی کلمات فارسی جذاب - آغامیرزا',
+  title: 'واژه بهشت - Vāژه Behesht',
+  description: 'یک بازی کلمات فارسی جذاب الهام گرفته از آغامیرزا',
 };
 
 export default function RootLayout({
@@ -14,12 +14,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl">
+    <html lang="fa" dir="rtl" className="dark">
       <head>
-        {/* The Google Font import for Literata has been removed. */}
-        {/* If you have B Titr font files (e.g., woff2), you would typically add @font-face rules in globals.css */}
+        {/* Font files (e.g., woff2 for B Titr) would typically be linked here or via @font-face in globals.css */}
+        {/* For this setup, we rely on the user having 'B Titr' installed or CSS fallback. */}
       </head>
-      <body className="font-body antialiased">
+      <body className="font-body antialiased bg-background text-foreground">
         {children}
         <Toaster />
       </body>

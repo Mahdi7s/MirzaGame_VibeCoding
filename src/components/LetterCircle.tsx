@@ -14,16 +14,14 @@ interface LetterCircleProps {
 
 const LetterCircle: FC<LetterCircleProps> = ({ letters, onLetterMouseDown, onLetterMouseEnter, selectedIndices, disabled }) => {
   const radius = 100; 
-  const buttonSize = 48; // w-12, h-12
+  const buttonSize = 48; 
   const buttonRadius = buttonSize / 2;
-  const circleContainerSize = radius * 2 + buttonSize + 20; // Adjusted for better spacing if buttons are larger
+  const circleContainerSize = radius * 2 + buttonSize + 20; 
   const svgCenter = circleContainerSize / 2;
 
   const selectedPositions = useMemo(() => {
     if (letters.length === 0) return [];
     return selectedIndices.map(selectedIndex => {
-      // Find the original index of the selected letter in the `letters` array
-      // This assumes selectedIndices contains indices relative to the `letters` array
       const angle = (selectedIndex / letters.length) * 2 * Math.PI - Math.PI / 2;
       const letterXOffset = radius * Math.cos(angle);
       const letterYOffset = radius * Math.sin(angle);
@@ -36,7 +34,7 @@ const LetterCircle: FC<LetterCircleProps> = ({ letters, onLetterMouseDown, onLet
 
 
   return (
-    <div className="flex justify-center items-center my-8">
+    <div className="flex justify-center items-center my-4">
       <div
         className="relative rounded-full animate-glow border-2 border-primary/50"
         style={{ width: `${circleContainerSize}px`, height: `${circleContainerSize}px` }}
@@ -44,14 +42,14 @@ const LetterCircle: FC<LetterCircleProps> = ({ letters, onLetterMouseDown, onLet
         <svg 
           width={circleContainerSize} 
           height={circleContainerSize} 
-          className="absolute top-0 left-0 pointer-events-none z-0" // Ensure SVG is behind buttons if needed, but buttons are separate DOM
+          className="absolute top-0 left-0 pointer-events-none z-0"
         >
           {selectedPositions.length > 1 &&
             selectedPositions.slice(0, -1).map((pos, i) => {
               const nextPos = selectedPositions[i + 1];
               return (
                 <line
-                  key={`line-${i}-${pos.x}-${pos.y}-${nextPos.x}-${nextPos.y}`} // More unique key
+                  key={`line-${i}-${pos.x}-${pos.y}-${nextPos.x}-${nextPos.y}`}
                   x1={pos.x}
                   y1={pos.y}
                   x2={nextPos.x}
@@ -66,8 +64,8 @@ const LetterCircle: FC<LetterCircleProps> = ({ letters, onLetterMouseDown, onLet
 
         {letters.map((letter, index) => {
           const angle = (index / letters.length) * 2 * Math.PI - Math.PI / 2;
-          const x = radius * Math.cos(angle); // Offset for CSS positioning from center
-          const y = radius * Math.sin(angle); // Offset for CSS positioning from center
+          const x = radius * Math.cos(angle); 
+          const y = radius * Math.sin(angle); 
           const isSelected = selectedIndices.includes(index);
 
           return (
@@ -86,7 +84,6 @@ const LetterCircle: FC<LetterCircleProps> = ({ letters, onLetterMouseDown, onLet
               }}
               onTouchStart={(e) => {
                 if (!disabled) {
-                  // e.preventDefault(); // Can interfere with scroll, test carefully
                   onLetterMouseDown(index);
                 }
               }}
