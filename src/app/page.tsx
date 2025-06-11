@@ -10,6 +10,7 @@ import CrosswordGrid from '@/components/CrosswordGrid';
 import CurrentWordDisplay from '@/components/CurrentWordDisplay';
 import GameControls from '@/components/GameControls';
 import LevelCompleteDialog from '@/components/LevelCompleteDialog';
+import LevelSelectDialog from '@/components/LevelSelectDialog'; // New Import
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -49,6 +50,7 @@ export default function HomePage() {
   const MAX_HINTS_PER_LEVEL = 3;
 
   const [isLevelComplete, setIsLevelComplete] = useState(false);
+  const [isLevelSelectOpen, setIsLevelSelectOpen] = useState(false); // New state for dialog
   const { toast } = useToast();
 
   const disabledDraggableInput = useMemo(() => currentWord.length >= 7, [currentWord]);
@@ -274,6 +276,13 @@ export default function HomePage() {
     }
     setIsLevelComplete(false);
   };
+
+  const handleSelectLevel = (levelIndex: number) => {
+    if (levelIndex !== currentLevelIndex) {
+      setCurrentLevelIndex(levelIndex);
+    }
+    setIsLevelSelectOpen(false); // Close dialog after selection
+  };
   
   const isHintDisabled = useMemo(() => hintsUsedThisLevel >= MAX_HINTS_PER_LEVEL || (currentLevel && foundWords.size === currentLevel.targetWords.length), [hintsUsedThisLevel, foundWords.size, currentLevel]);
 
@@ -295,7 +304,11 @@ export default function HomePage() {
         transition={{ duration: 0.5 }}
         className="min-h-screen flex flex-col items-center p-2 sm:p-3 container mx-auto font-body"
       >
-        <GameHeader levelName={currentLevel.name} score={score} />
+        <GameHeader 
+          levelName={currentLevel.name} 
+          score={score} 
+          onOpenLevelSelect={() => setIsLevelSelectOpen(true)}
+        />
         
         <main className="flex-grow flex flex-col items-center justify-start w-full max-w-2xl mt-1">
           <div className="mt-2 mb-1 w-full">
@@ -336,9 +349,15 @@ export default function HomePage() {
           levelName={currentLevel.name}
           isLastLevel={currentLevelIndex === levels.length - 1}
         />
+
+        <LevelSelectDialog
+          isOpen={isLevelSelectOpen}
+          onOpenChange={setIsLevelSelectOpen}
+          levels={levels}
+          onSelectLevel={handleSelectLevel}
+          currentLevelIndex={currentLevelIndex}
+        />
       </motion.div>
     </AnimatePresence>
   );
 }
-
-    
