@@ -17,6 +17,16 @@ type GridCell = string | null;
 
 const LOCAL_STORAGE_LEVEL_KEY = 'aghaMirzaCurrentLevelIndex';
 
+// Helper function to play sounds
+const playSound = (soundFile: string) => {
+  try {
+    const audio = new Audio(soundFile);
+    audio.play().catch(error => console.error("Error playing sound:", soundFile, error));
+  } catch (error) {
+    console.error("Error creating audio element for:", soundFile, error);
+  }
+};
+
 export default function HomePage() {
   const [currentLevelIndex, setCurrentLevelIndex] = useState<number>(0);
   const [isInitialLoadComplete, setIsInitialLoadComplete] = useState<boolean>(false);
@@ -42,7 +52,6 @@ export default function HomePage() {
 
   const disabledDraggableInput = useMemo(() => currentWord.length >= 7, [currentWord]);
 
-  // Load saved level from localStorage on initial mount
   useEffect(() => {
     const savedLevelIndexStr = localStorage.getItem(LOCAL_STORAGE_LEVEL_KEY);
     if (savedLevelIndexStr) {
@@ -50,13 +59,15 @@ export default function HomePage() {
       if (!isNaN(savedLevelIndex) && savedLevelIndex >= 0 && savedLevelIndex < levels.length) {
         setCurrentLevelIndex(savedLevelIndex);
       } else {
-        setCurrentLevelIndex(0); // Default to 0 if saved index is invalid
+        localStorage.removeItem(LOCAL_STORAGE_LEVEL_KEY); // Clear invalid entry
+        setCurrentLevelIndex(0); 
       }
+    } else {
+        setCurrentLevelIndex(0);
     }
     setIsInitialLoadComplete(true);
-  }, []); // Runs only once on mount
+  }, []);
 
-  // Save currentLevelIndex to localStorage whenever it changes, after initial load
   useEffect(() => {
     if (isInitialLoadComplete) {
       localStorage.setItem(LOCAL_STORAGE_LEVEL_KEY, currentLevelIndex.toString());
@@ -132,20 +143,20 @@ export default function HomePage() {
       setScore(prev => prev + currentWord.length * 10);
       updateGridWithWord(targetWordEntry);
       toast({ title: "عالی!", description: `کلمه "${currentWord}" پیدا شد!`, variant: "default", duration: 2000 });
+      playSound('/sounds/correct-word.mp3');
       
       if (newFoundWords.size === currentLevel.targetWords.length) {
         setIsLevelComplete(true);
+        playSound('/sounds/level-complete.mp3');
         setScore(prev => prev + 50); 
       }
     } else if (currentLevel.bonusWords.includes(currentWord) && !foundBonusWords.has(currentWord)) {
       setFoundBonusWords(prev => new Set(prev).add(currentWord));
       setScore(prev => prev + currentWord.length * 5);
       toast({ title: "جایزه!", description: `کلمه اضافه "${currentWord}" پیدا شد!`, variant: "default", duration: 2000 });
+      playSound('/sounds/correct-word.mp3');
     } else if (foundWords.has(currentWord) || foundBonusWords.has(currentWord)) {
       toast({ title: "تکراری", description: "این کلمه قبلا پیدا شده.", variant: "destructive", duration: 2000 });
-    } else {
-      // It's a valid Persian word, but not for this level
-      // toast({ title: "کلمه معتبر", description: `"${currentWord}" یک کلمه معتبر است، اما جزو کلمات این مرحله نیست.`, variant: "default", duration: 2500 });
     }
     clearSelection();
   }, [currentWord, currentLevel, foundWords, foundBonusWords, updateGridWithWord, toast, clearSelection, score]);
@@ -153,6 +164,7 @@ export default function HomePage() {
 
   const handleLetterMouseDown = useCallback((index: number) => {
     if (disabledDraggableInput) return;
+    playSound('/sounds/letter-drag.mp3');
     setIsDraggingWord(true);
     setSelectedLetterIndices([index]);
     setCurrentWord(availableLetters[index]);
@@ -232,16 +244,14 @@ export default function HomePage() {
       setCurrentLevelIndex(prev => prev + 1);
     } else {
       toast({ title: "پایان بازی!", description: "شما تمام مراحل را با موفقیت به پایان رساندید!" });
-      setCurrentLevelIndex(0); // Reset to level 0 after completing all levels
+      setCurrentLevelIndex(0); 
     }
     setIsLevelComplete(false);
   };
   
   const isHintDisabled = useMemo(() => hintsUsedThisLevel >= MAX_HINTS_PER_LEVEL || (currentLevel && foundWords.size === currentLevel.targetWords.length), [hintsUsedThisLevel, foundWords.size, currentLevel]);
 
-  if (!currentLevel) {
-    // This can happen briefly if currentLevelIndex is updated before newLevel is set
-    // or if currentLevelIndex is out of bounds (e.g. after localStorage load before validation)
+  if (!currentLevel || !isInitialLoadComplete) {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-2 sm:p-3 container mx-auto font-body">
             در حال بارگذاری مرحله...
