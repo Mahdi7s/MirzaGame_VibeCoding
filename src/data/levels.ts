@@ -84,10 +84,19 @@ export const levels: Level[] = [
     name: "مرحله چهارم",
     letters: ["ر", "م", "ز", "ت"],
     targetWords: [
-      //   T R M Z  (ترمز horizontal)
-      //   . Z . R  (رزم vertical, shares R)
-      //   . M . M  (رمز vertical, shares M)
-      //   . Z . Z  (مرز vertical, shares Z)
+      // Layout:
+      // T R M Z  (ترمز horizontal)
+      // . Z . .  (R from رزم shared with ترمز)
+      // . M . .  (M from رزم)
+      //
+      //   R      (R from مرز shared with ترمز's M)
+      //   M      (M from مرز)
+      //   Z      (Z from مرز)
+      //
+      //     Z    (Z from رمز shared with ترمز's Z)
+      //     M    (M from رمز)
+      //     R    (R from رمز)
+
       { word: "ترمز", startX: 0, startY: 0, direction: "horizontal" }, // T(0,0) R(1,0) M(2,0) Z(3,0)
       { word: "رزم", startX: 1, startY: 0, direction: "vertical" },   // R(1,0) Z(1,1) M(1,2) - Shares R from ترمز
       { word: "مرز", startX: 2, startY: 0, direction: "vertical" },   // M(2,0) R(2,1) Z(2,2) - Shares M from ترمز
@@ -96,7 +105,7 @@ export const levels: Level[] = [
     bonusWords: ["رز", "رم", "مت", "مر", "تر", "تم"],
     backgroundUrl: "https://placehold.co/1920x1080.png",
     dataAiHint: "ancient ruins",
-    gridSize: { rows: 3, cols: 4 }, // Adjusted grid size for the new layout
+    gridSize: { rows: 3, cols: 4 }, // Adjusted for the layout
   },
   // Level 5: ریل، یار، ریال
   {
@@ -137,94 +146,61 @@ export const levels: Level[] = [
     gridSize: { rows: 5, cols: 4 },
   },
   // Level 7: پاک، پتک، پاکت - Revised layout
-  // Layout:
-  //   . P . .
-  //   P A K T  (پاکت horizontal)
-  //   . K . K  (پاک vertical sharing K from پاکت)
-  //   . T . .  (پتک vertical sharing T from پاکت)
   {
     id: 7,
     name: "مرحله هفتم",
     letters: ["پ", "ا", "ک", "ت"], // P, A, K, T
     targetWords: [
-      { word: "پاکت", startX: 0, startY: 1, direction: "horizontal" }, // P(0,1), A(1,1), K(2,1), T(3,1)
-      { word: "پاک", startX: 2, startY: 0, direction: "vertical" },     // P(2,0), A(2,1)(shares A with پاکت not K!), K(2,2) - Corrected: P(X,Y), A(X,Y+1), K(X,Y+2)
-                                                                      // Let پاک share K with پاکت. So K is at (2,1).
-                                                                      // P A K -> P(2,-1), A(2,0), K(2,1). This would be { word: "پاک", startX: 2, startY: -1, direction: "vertical" } Not ideal.
-                                                                      // How about:
-                                                                      //   P . .
-                                                                      //   A . .
-                                                                      // K(0,2) K(1,2) T(2,2) (پاکت)
-                                                                      // P(0,0) A(0,1) K(0,2) (پاک)
-      { word: "پاک", startX: 0, startY: 0, direction: "vertical" }, // P(0,0) A(0,1) K(0,2)
-      // { word: "پاکت", startX: 0, startY: 2, direction: "horizontal" }, // P(0,2) (Shares P from پاک), A(1,2), K(2,2), T(3,2) -> No, K from پاک
-                                                                      // K is at (0,2) from پاک.
-      // So پاکت must share K(0,2).  پاکت is P A K T
-      // If K is at (0,2), then پاکت can be P(-2,2) A(-1,2) K(0,2) T(1,2) or T A P K.
-      // Let's use the initially proposed layout:
+      // Layout:
       //   . . P .  (P from پاک at (2,0))
       //   . . A P  (A from پاک at (2,1), P from پتک at (3,1))
       //   P A K T  (پاکت at y=2, K shared with پاک, T shared with پتک)
       //   . . . K  (K from پتک at (3,3))
-      // This was the fixed one from before. Let's re-verify its targetWords:
-      // { word: "پاک", startX: 2, startY: 0, direction: "vertical" },     // P(2,0), A(2,1), K(2,2)
-      // { word: "پاکت", startX: 0, startY: 2, direction: "horizontal" }, // P(0,2), A(1,2), K(2,2) (shares K with پاک), T(3,2)
-      // { word: "پتک", startX: 3, startY: 1, direction: "vertical" },     // P(3,1), T(3,2) (shares T with پاکت), K(3,3)
-      // This seems correct and was the result of a previous fix. User states it's still an issue.
-      // Let's re-evaluate "پاکت" and its intersections.
-      // If "پاکت" is found first: P(0,2) A(1,2) K(2,2) T(3,2)
-      // Then "پاک" is found { word: "پاک", startX: 2, startY: 0, direction: "vertical" }: P(2,0) A(2,1) K(2,2) -> K is shared. OK.
-      // Then "پتک" is found { word: "پتک", startX: 3, startY: 1, direction: "vertical" }: P(3,1) T(3,2) K(3,3) -> T is shared. OK.
-      // This specific layout should work. If it's not, the issue might be subtle or a different sequence of finding words.
-      // The user just said "مرحله ۷ پاکت رو بخوام تشخیص بدم داخل جدول کلمات دیگه مشکل میخورن"
-      // This implies "پاکت" is found, then other words might overwrite it or it overwrites others if they were found first.
-      // The existing fixed definition for Level 7:
-      // targetWords: [
-      //  { word: "پاک", startX: 2, startY: 0, direction: "vertical" },     // P(2,0), A(2,1), K(2,2)
-      //  { word: "پاکت", startX: 0, startY: 2, direction: "horizontal" }, // P(0,2), A(1,2), K(2,2) (shares K with پاک), T(3,2)
-      //  { word: "پتک", startX: 3, startY: 1, direction: "vertical" },     // P(3,1), T(3,2) (shares T with پاکت), K(3,3)
-      // ],
-      // If پاک is found first: P(2,0) A(2,1) K(2,2)
-      // Then پاکت is found: P(0,2) A(1,2) K(2,2) T(3,2). K(2,2) is shared, this is fine.
-      // Then پتک is found: P(3,1) T(3,2) K(3,3). T(3,2) is shared, this is fine.
-      // The current definition looks robust. No changes to level 7 for now unless more specific sequence is provided.
+      { word: "پاک", startX: 2, startY: 0, direction: "vertical" },     // P(2,0), A(2,1), K(2,2)
+      { word: "پاکت", startX: 0, startY: 2, direction: "horizontal" }, // P(0,2), A(1,2), K(2,2) (shares K with پاک), T(3,2)
+      { word: "پتک", startX: 3, startY: 1, direction: "vertical" },     // P(3,1), T(3,2) (shares T with پاکت), K(3,3)
     ],
-    bonusWords: ["پک", "تک", "تاپ", "کات", "تپ"], // پک (PK), تک (TK), تاپ (TAP), کات (KAT), تپ (TP)
+    bonusWords: ["پک", "تک", "تاپ", "کات", "تپ"],
     backgroundUrl: "https://placehold.co/1920x1080.png",
     dataAiHint: "library interior",
     gridSize: { rows: 4, cols: 4 },
   },
-  // Level 8: هنر، رهن، قرن، نهر، نقره
+  // Level 8: هنر، رهن، قرن، نهر، نقره - Revised Layout
   {
     id: 8,
     name: "مرحله هشتم",
     letters: ["ه", "ن", "ر", "ق"],
     targetWords: [
-      { word: "نقره", startX: 0, startY: 1, direction: "horizontal" }, // N(0,1) Q(1,1) R(2,1) H(3,1)
-      { word: "هنر", startX: 3, startY: 1, direction: "vertical" },   // H(3,1) N(3,2) R(3,3) - Shares H with نقره
-      { word: "نهر", startX: 0, startY: 1, direction: "vertical" },   // N(0,1) H(0,2) R(0,3) - Shares N with نقره
-      { word: "قرن", startX: 1, startY: 1, direction: "vertical" },   // Q(1,1) R(1,2) N(1,3) - Shares Q with نقره
-      { word: "رهن", startX: 2, startY: 1, direction: "vertical" },   // R(2,1) H(2,2) N(2,3) - Shares R with نقره
+      //    N Q R H (نقره)
+      //    H . H N
+      //    R . N R
+      //      . R Q
+      { word: "نقره", startX: 0, startY: 0, direction: "horizontal" }, // N(0,0) Q(1,0) R(2,0) H(3,0)
+      { word: "هنر", startX: 3, startY: 0, direction: "vertical" },   // H(3,0) N(3,1) R(3,2) - Shares H with نقره
+      { word: "نهر", startX: 0, startY: 0, direction: "vertical" },   // N(0,0) H(0,1) R(0,2) - Shares N with نقره
+      { word: "قرن", startX: 1, startY: 0, direction: "vertical" },   // Q(1,0) R(1,1) N(1,2) - Shares Q with نقره
+      { word: "رهن", startX: 2, startY: 0, direction: "vertical" },   // R(2,0) H(2,1) N(2,2) - Shares R with نقره
     ],
     bonusWords: ["ره", "نه", "رق", "نق", "قر", "هن"],
     backgroundUrl: "https://placehold.co/1920x1080.png",
     dataAiHint: "starry night",
-    gridSize: { rows: 4, cols: 4 },
+    gridSize: { rows: 4, cols: 4 }, // gridSize remains 4x4, words fit
   },
-  // Level 9: شال، بال، بلا، بالش
+  // Level 9: شال، بال، بلا، بالش - Revised Layout
   {
     id: 9,
     name: "مرحله نهم",
     letters: ["ش", "ا", "ل", "ب"],
     targetWords: [
-      { word: "بالش", startX: 0, startY: 1, direction: "horizontal" }, // ب ا ل ش
-      { word: "بال", startX: 0, startY: 1, direction: "vertical" },   // ب (از بالش)
-                                                                    // ا
-                                                                    // ل
-      { word: "شال", startX: 3, startY: 0, direction: "vertical" },   //       ش (از بالش)
-                                                                    //       ا
-                                                                    //       ل
-      { word: "بلا", startX: 0, startY: 3, direction: "horizontal" }, // ب ل ا (ب از بال, ل از بال و شال)
+      // Layout:
+      //   . . B .
+      //   B A L SH
+      //   A . A A
+      //   L . . L
+      { word: "بالش", startX: 0, startY: 1, direction: "horizontal" }, // B(0,1) A(1,1) L(2,1) SH(3,1)
+      { word: "بال", startX: 0, startY: 1, direction: "vertical" },   // B(0,1) A(0,2) L(0,3) - Shares B from بالش
+      { word: "شال", startX: 3, startY: 1, direction: "vertical" },   // SH(3,1) A(3,2) L(3,3) - Shares SH from بالش
+      { word: "بلا", startX: 2, startY: 0, direction: "vertical" },   // B(2,0) L(2,1) A(2,2) - Shares L from بالش
     ],
     bonusWords: ["لب", "آش", "بل", "لاش"],
     backgroundUrl: "https://placehold.co/1920x1080.png",
@@ -235,7 +211,7 @@ export const levels: Level[] = [
   {
     id: 10,
     name: "مرحله دهم",
-    letters: ["آ", "ه", "ک", "و"], 
+    letters: ["آ", "ه", "ک", "و"],
     targetWords: [
       { word: "کاهو", startX: 0, startY: 1, direction: "horizontal" }, // ک ا ه و ('ا' for آ)
       { word: "کاوه", startX: 0, startY: 1, direction: "vertical" },   // ک (از کاهو)
@@ -251,7 +227,7 @@ export const levels: Level[] = [
     bonusWords: ["آه", "کاو", "آوا", "وه", "هو", "ها"],
     backgroundUrl: "https://placehold.co/1920x1080.png",
     dataAiHint: "traditional teahouse",
-    gridSize: { rows: 5, cols: 4 }, 
+    gridSize: { rows: 5, cols: 4 },
   },
   // Level 11: میخ، خیر، مریخ، خمیر
   {
@@ -272,14 +248,6 @@ export const levels: Level[] = [
     bonusWords: ["خم", "رخ", "ری", "خی", "مر"],
     backgroundUrl: "https://placehold.co/1920x1080.png",
     dataAiHint: "persian calligraphy",
-    gridSize: { rows: 5, cols: 4 }, 
+    gridSize: { rows: 5, cols: 4 },
   },
 ];
-
-    
-
-    
-
-    
-
-    
