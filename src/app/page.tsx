@@ -59,12 +59,12 @@ export default function HomePage() {
     setRevealedHintCells(new Set());
     setIsDraggingWord(false);
     
-    document.body.style.backgroundImage = ''; // Ensures no direct background image styling from JS
+    document.body.style.backgroundImage = ''; 
     document.body.style.backgroundSize = '';
     document.body.style.backgroundPosition = '';
     document.body.style.backgroundAttachment = '';
 
-  }, [currentLevelIndex, initializeGrid]); // `levels` is a constant import, not needed in deps
+  }, [currentLevelIndex, initializeGrid, levels]); 
 
   const clearSelection = useCallback(() => {
     setSelectedLetterIndices([]);
@@ -118,7 +118,6 @@ export default function HomePage() {
     } else if (foundWords.has(currentWord) || foundBonusWords.has(currentWord)) {
       toast({ title: "تکراری", description: "این کلمه قبلا پیدا شده.", variant: "destructive", duration: 2000 });
     } else {
-      // Word is in persianWords but not a target or bonus word for this level
       toast({ title: "کلمه معتبر", description: `"${currentWord}" یک کلمه معتبر است، اما جزو کلمات این مرحله نیست.`, variant: "default", duration: 2500 });
     }
     clearSelection();
@@ -143,23 +142,20 @@ export default function HomePage() {
     const handleMouseUpGlobal = () => {
       if (isDraggingWord) {
         setIsDraggingWord(false);
-        // Word submission is now triggered on drag end
         handleSubmitWord(); 
       }
     };
   
-    // Add event listeners only when dragging
     if (isDraggingWord) {
       document.addEventListener('mouseup', handleMouseUpGlobal);
       document.addEventListener('touchend', handleMouseUpGlobal);
     }
   
-    // Cleanup function
     return () => {
       document.removeEventListener('mouseup', handleMouseUpGlobal);
       document.removeEventListener('touchend', handleMouseUpGlobal);
     };
-  }, [isDraggingWord, handleSubmitWord]); // Dependencies for adding/removing listeners
+  }, [isDraggingWord, handleSubmitWord]); 
 
 
   const handleShuffleLetters = () => {
@@ -223,12 +219,12 @@ export default function HomePage() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.5 }}
-        className="min-h-screen flex flex-col items-center p-2 sm:p-4 container mx-auto font-body"
+        className="min-h-screen flex flex-col items-center p-2 sm:p-3 container mx-auto font-body"
       >
         <GameHeader levelName={currentLevel.name} score={score} />
         
-        <main className="flex-grow flex flex-col items-center justify-start w-full max-w-2xl">
-          <div className="my-3 w-full">
+        <main className="flex-grow flex flex-col items-center justify-start w-full max-w-2xl mt-1">
+          <div className="my-4 w-full">
             <CrosswordGrid 
               gridState={gridState} 
               gridSize={currentLevel.gridSize}
@@ -237,11 +233,11 @@ export default function HomePage() {
             />
           </div>
           
-          <div className="my-2 w-full">
+          <div className="my-1 w-full">
             <CurrentWordDisplay word={currentWord} />
           </div>
           
-          <div className="my-4 w-full">
+          <div className="my-3 w-full">
             <LetterCircle 
               letters={availableLetters} 
               onLetterMouseDown={handleLetterMouseDown}
@@ -251,7 +247,7 @@ export default function HomePage() {
             />
           </div>
           
-          <div className="my-3 w-full">
+          <div className="my-2 w-full">
             <GameControls 
               onShuffle={handleShuffleLetters}
               onHint={handleHint}
@@ -271,4 +267,3 @@ export default function HomePage() {
     </AnimatePresence>
   );
 }
-

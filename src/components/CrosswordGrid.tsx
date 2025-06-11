@@ -22,7 +22,7 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
     return cells;
   }, [targetWords]);
 
-  const cellSizeRem = Math.min(2.5, 20 / Math.max(gridSize.cols, gridSize.rows));
+  const cellSizeRem = Math.min(3, 25 / Math.max(gridSize.cols, gridSize.rows));
 
 
   return (
@@ -47,7 +47,7 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
               <div
                 key={cellKey}
                 className={`w-full h-full flex items-center justify-center border border-border text-xl sm:text-2xl font-bold
-                  ${isActive ? 'bg-background' : 'bg-muted'}
+                  ${isActive ? 'bg-background' : 'bg-muted/50'}
                   ${letter ? 'text-accent animate-celebrate' : 'text-transparent'}
                   ${isHint && !letter ? 'bg-primary/20' : ''}
                 `}
