@@ -27,6 +27,10 @@ const playSound = (soundFile: string) => {
   }
 };
 
+const normalizeAlef = (word: string): string => {
+  return word.replace(/آ/g, 'ا');
+};
+
 export default function HomePage() {
   const [currentLevelIndex, setCurrentLevelIndex] = useState<number>(0);
   const [isInitialLoadComplete, setIsInitialLoadComplete] = useState<boolean>(false);
@@ -59,7 +63,7 @@ export default function HomePage() {
       if (!isNaN(savedLevelIndex) && savedLevelIndex >= 0 && savedLevelIndex < levels.length) {
         setCurrentLevelIndex(savedLevelIndex);
       } else {
-        localStorage.removeItem(LOCAL_STORAGE_LEVEL_KEY); // Clear invalid entry
+        localStorage.removeItem(LOCAL_STORAGE_LEVEL_KEY); 
         setCurrentLevelIndex(0); 
       }
     } else {
@@ -101,7 +105,7 @@ export default function HomePage() {
       document.body.style.backgroundPosition = '';
       document.body.style.backgroundAttachment = '';
     }
-  }, [currentLevelIndex, initializeGrid, levels]); 
+  }, [currentLevelIndex, initializeGrid]); 
 
   const clearSelection = useCallback(() => {
     setSelectedLetterIndices([]);
@@ -127,37 +131,62 @@ export default function HomePage() {
   const handleSubmitWord = useCallback(() => {
     if (!currentWord) return;
 
-    const isGenerallyValid = persianWords.has(currentWord);
+    const normalizedCurrentWord = normalizeAlef(currentWord);
 
-    if (!isGenerallyValid) {
-      toast({ title: "کلمه نامعتبر", description: `"${currentWord}" در لغت‌نامه یافت نشد.`, variant: "destructive", duration: 2000 });
+    // 1. Check Target Words
+    const targetWordEntry = currentLevel.targetWords.find(
+      (entry) => normalizeAlef(entry.word) === normalizedCurrentWord
+    );
+
+    if (targetWordEntry) {
+      if (!foundWords.has(targetWordEntry.word)) {
+        const newFoundWords = new Set(foundWords).add(targetWordEntry.word);
+        setFoundWords(newFoundWords);
+        setScore((prev) => prev + targetWordEntry.word.length * 10);
+        updateGridWithWord(targetWordEntry); // Use original entry to fill grid
+        toast({ title: "عالی!", description: `کلمه "${targetWordEntry.word}" پیدا شد!`, variant: "default", duration: 2000 });
+        playSound('/sounds/correct-word.mp3');
+        
+        if (newFoundWords.size === currentLevel.targetWords.length) {
+          setIsLevelComplete(true);
+          playSound('/sounds/level-complete.mp3');
+          setScore((prev) => prev + 50); 
+        }
+      } else {
+        toast({ title: "تکراری", description: "این کلمه قبلا پیدا شده.", variant: "destructive", duration: 2000 });
+      }
       clearSelection();
       return;
     }
 
-    const targetWordEntry = currentLevel.targetWords.find(entry => entry.word === currentWord);
+    // 2. Check Bonus Words
+    const bonusWordDef = currentLevel.bonusWords.find(
+      (bw) => normalizeAlef(bw) === normalizedCurrentWord
+    );
 
-    if (targetWordEntry && !foundWords.has(currentWord)) {
-      const newFoundWords = new Set(foundWords).add(currentWord);
-      setFoundWords(newFoundWords);
-      setScore(prev => prev + currentWord.length * 10);
-      updateGridWithWord(targetWordEntry);
-      toast({ title: "عالی!", description: `کلمه "${currentWord}" پیدا شد!`, variant: "default", duration: 2000 });
-      playSound('/sounds/correct-word.mp3');
-      
-      if (newFoundWords.size === currentLevel.targetWords.length) {
-        setIsLevelComplete(true);
-        playSound('/sounds/level-complete.mp3');
-        setScore(prev => prev + 50); 
+    if (bonusWordDef) {
+      if (!foundBonusWords.has(bonusWordDef)) {
+        setFoundBonusWords((prev) => new Set(prev).add(bonusWordDef));
+        setScore((prev) => prev + bonusWordDef.length * 5);
+        toast({ title: "جایزه!", description: `کلمه اضافه "${bonusWordDef}" پیدا شد!`, variant: "default", duration: 2000 });
+        playSound('/sounds/correct-word.mp3');
+      } else {
+        toast({ title: "تکراری", description: "این کلمه قبلا پیدا شده.", variant: "destructive", duration: 2000 });
       }
-    } else if (currentLevel.bonusWords.includes(currentWord) && !foundBonusWords.has(currentWord)) {
-      setFoundBonusWords(prev => new Set(prev).add(currentWord));
-      setScore(prev => prev + currentWord.length * 5);
-      toast({ title: "جایزه!", description: `کلمه اضافه "${currentWord}" پیدا شد!`, variant: "default", duration: 2000 });
-      playSound('/sounds/correct-word.mp3');
-    } else if (foundWords.has(currentWord) || foundBonusWords.has(currentWord)) {
-      toast({ title: "تکراری", description: "این کلمه قبلا پیدا شده.", variant: "destructive", duration: 2000 });
+      clearSelection();
+      return;
     }
+
+    // 3. If not target or bonus
+    const isGenerallyValid = persianWords.has(currentWord) || (currentWord.includes('ا') && persianWords.has(currentWord.replace(/ا/g, 'آ')));
+
+    if (!isGenerallyValid) {
+        toast({ title: "کلمه نامعتبر", description: `"${currentWord}" در لغت‌نامه یافت نشد.`, variant: "destructive", duration: 2000 });
+    } else {
+        // It's a valid Persian word, but not part of this specific puzzle
+        toast({ title: "یافت نشد", description: `"${currentWord}" جزو کلمات این مرحله نیست.`, variant: "destructive", duration: 2000 });
+    }
+
     clearSelection();
   }, [currentWord, currentLevel, foundWords, foundBonusWords, updateGridWithWord, toast, clearSelection, score]);
 
@@ -223,7 +252,7 @@ export default function HomePage() {
       if (gridState[r]?.[c] === null && !revealedHintCells.has(cellKey)) {
         setGridState(prevGrid => {
           const newGrid = prevGrid.map(row => [...row]);
-          if(newGrid[r] !== undefined) newGrid[r][c] = wordToHint.word[i];
+          if(newGrid[r] !== undefined) newGrid[r][c] = wordToHint.word[i]; // Use original char from wordToHint
           return newGrid;
         });
         setRevealedHintCells(prev => new Set(prev).add(cellKey));
@@ -272,7 +301,7 @@ export default function HomePage() {
         <GameHeader levelName={currentLevel.name} score={score} />
         
         <main className="flex-grow flex flex-col items-center justify-start w-full max-w-2xl mt-1">
-          <div className="my-4 w-full">
+          <div className="mt-2 mb-1 w-full"> {/* Adjusted margins */}
             <CrosswordGrid 
               gridState={gridState} 
               gridSize={currentLevel.gridSize}
@@ -281,11 +310,11 @@ export default function HomePage() {
             />
           </div>
           
-          <div className="my-1 w-full">
+          <div className="my-0 w-full"> {/* Adjusted margins */}
             <CurrentWordDisplay word={currentWord} />
           </div>
           
-          <div className="my-3 w-full">
+          <div className="mt-2 mb-1 w-full"> {/* Adjusted margins */}
             <LetterCircle 
               letters={availableLetters} 
               onLetterMouseDown={handleLetterMouseDown}
@@ -295,7 +324,7 @@ export default function HomePage() {
             />
           </div>
           
-          <div className="my-2 w-full">
+          <div className="mt-1 w-full"> {/* Adjusted margins */}
             <GameControls 
               onShuffle={handleShuffleLetters}
               onHint={handleHint}
@@ -315,4 +344,3 @@ export default function HomePage() {
     </AnimatePresence>
   );
 }
-

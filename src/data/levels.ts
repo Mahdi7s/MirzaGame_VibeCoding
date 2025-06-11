@@ -84,28 +84,19 @@ export const levels: Level[] = [
     name: "مرحله چهارم",
     letters: ["ر", "م", "ز", "ت"],
     targetWords: [
-      // Layout:
-      // T R M Z  (ترمز horizontal)
-      // . Z . .  (R from رزم shared with ترمز)
-      // . M . .  (M from رزم)
-      //
-      //   R      (R from مرز shared with ترمز's M)
-      //   M      (M from مرز)
-      //   Z      (Z from مرز)
-      //
-      //     Z    (Z from رمز shared with ترمز's Z)
-      //     M    (M from رمز)
-      //     R    (R from رمز)
-
+      //  T R M Z
+      //  . Z . .
+      //  . M . R
+      //    . . Z
       { word: "ترمز", startX: 0, startY: 0, direction: "horizontal" }, // T(0,0) R(1,0) M(2,0) Z(3,0)
-      { word: "رزم", startX: 1, startY: 0, direction: "vertical" },   // R(1,0) Z(1,1) M(1,2) - Shares R from ترمز
-      { word: "مرز", startX: 2, startY: 0, direction: "vertical" },   // M(2,0) R(2,1) Z(2,2) - Shares M from ترمز
-      { word: "رمز", startX: 3, startY: 0, direction: "vertical" },   // Z(3,0) M(3,1) R(3,2) - Shares Z from ترمز
+      { word: "رزم",  startX: 1, startY: 0, direction: "vertical" },   // R(1,0) Z(1,1) M(1,2) - Shares R from ترمز
+      { word: "مرز",  startX: 2, startY: 0, direction: "vertical" },   // M(2,0) R(2,2) Z(2,3) - Shares M from ترمز
+      { word: "رمز",  startX: 3, startY: 0, direction: "vertical" }    // Z(3,0) M(3,1) R(3,2) - Shares Z from ترمز
     ],
     bonusWords: ["رز", "رم", "مت", "مر", "تر", "تم"],
     backgroundUrl: "https://placehold.co/1920x1080.png",
     dataAiHint: "ancient ruins",
-    gridSize: { rows: 3, cols: 4 }, // Adjusted for the layout
+    gridSize: { rows: 4, cols: 4 },
   },
   // Level 5: ریل، یار، ریال
   {
@@ -119,7 +110,7 @@ export const levels: Level[] = [
                                                                     // ل
       { word: "یار", startX: 1, startY: 0, direction: "horizontal" }, //   ی ا ر (ی از ریال)
     ],
-    bonusWords: ["یل", "ری", "ایر", "لای", "آری"],
+    bonusWords: ["یل", "ری", "ایر", "لای", "آری"], // "آری" kept with 'آ'
     backgroundUrl: "https://placehold.co/1920x1080.png",
     dataAiHint: "coastal scene",
     gridSize: { rows: 4, cols: 4 },
@@ -152,10 +143,10 @@ export const levels: Level[] = [
     letters: ["پ", "ا", "ک", "ت"], // P, A, K, T
     targetWords: [
       // Layout:
-      //   . . P .  (P from پاک at (2,0))
-      //   . . A P  (A from پاک at (2,1), P from پتک at (3,1))
-      //   P A K T  (پاکت at y=2, K shared with پاک, T shared with پتک)
-      //   . . . K  (K from پتک at (3,3))
+      //   . . P .
+      //   . . A P
+      //   P A K T
+      //   . . . K
       { word: "پاک", startX: 2, startY: 0, direction: "vertical" },     // P(2,0), A(2,1), K(2,2)
       { word: "پاکت", startX: 0, startY: 2, direction: "horizontal" }, // P(0,2), A(1,2), K(2,2) (shares K with پاک), T(3,2)
       { word: "پتک", startX: 3, startY: 1, direction: "vertical" },     // P(3,1), T(3,2) (shares T with پاکت), K(3,3)
@@ -174,7 +165,7 @@ export const levels: Level[] = [
       //    N Q R H (نقره)
       //    H . H N
       //    R . N R
-      //      . R Q
+      //    . R . Q
       { word: "نقره", startX: 0, startY: 0, direction: "horizontal" }, // N(0,0) Q(1,0) R(2,0) H(3,0)
       { word: "هنر", startX: 3, startY: 0, direction: "vertical" },   // H(3,0) N(3,1) R(3,2) - Shares H with نقره
       { word: "نهر", startX: 0, startY: 0, direction: "vertical" },   // N(0,0) H(0,1) R(0,2) - Shares N with نقره
@@ -184,7 +175,7 @@ export const levels: Level[] = [
     bonusWords: ["ره", "نه", "رق", "نق", "قر", "هن"],
     backgroundUrl: "https://placehold.co/1920x1080.png",
     dataAiHint: "starry night",
-    gridSize: { rows: 4, cols: 4 }, // gridSize remains 4x4, words fit
+    gridSize: { rows: 4, cols: 4 },
   },
   // Level 9: شال، بال، بلا، بالش - Revised Layout
   {
@@ -192,17 +183,16 @@ export const levels: Level[] = [
     name: "مرحله نهم",
     letters: ["ش", "ا", "ل", "ب"],
     targetWords: [
-      // Layout:
       //   . . B .
       //   B A L SH
-      //   A . A A
+      //   A L A A
       //   L . . L
       { word: "بالش", startX: 0, startY: 1, direction: "horizontal" }, // B(0,1) A(1,1) L(2,1) SH(3,1)
       { word: "بال", startX: 0, startY: 1, direction: "vertical" },   // B(0,1) A(0,2) L(0,3) - Shares B from بالش
       { word: "شال", startX: 3, startY: 1, direction: "vertical" },   // SH(3,1) A(3,2) L(3,3) - Shares SH from بالش
       { word: "بلا", startX: 2, startY: 0, direction: "vertical" },   // B(2,0) L(2,1) A(2,2) - Shares L from بالش
     ],
-    bonusWords: ["لب", "آش", "بل", "لاش"],
+    bonusWords: ["لب", "آش", "بل", "لاش"], // "آش" kept with 'آ'
     backgroundUrl: "https://placehold.co/1920x1080.png",
     dataAiHint: "forest path",
     gridSize: { rows: 4, cols: 4 },
@@ -211,20 +201,20 @@ export const levels: Level[] = [
   {
     id: 10,
     name: "مرحله دهم",
-    letters: ["آ", "ه", "ک", "و"],
+    letters: ["ا", "ه", "ک", "و"], // Changed 'آ' to 'ا'
     targetWords: [
       { word: "کاهو", startX: 0, startY: 1, direction: "horizontal" }, // ک ا ه و ('ا' for آ)
       { word: "کاوه", startX: 0, startY: 1, direction: "vertical" },   // ک (از کاهو)
                                                                     // ا
                                                                     // و
                                                                     // ه
-      { word: "آهک", startX: 0, startY: 3, direction: "horizontal" },  // آ ه ک (ه از کاوه, ک از کاوه)
+      { word: "آهک", startX: 0, startY: 3, direction: "horizontal" },  // آ ه ک (ه از کاوه, ک از کاوه) - Kept 'آ'
       { word: "کوه", startX: 2, startY: 0, direction: "vertical" },   //     و (از کاهو)
                                                                     //     ه
                                                                     //     ک (از آهک)
       { word: "کاه", startX: 2, startY: 2, direction: "horizontal" }, //     ک ا ه (ک از آهک و کوه, ه از کاوه و کوه)
     ],
-    bonusWords: ["آه", "کاو", "آوا", "وه", "هو", "ها"],
+    bonusWords: ["آه", "کاو", "آوا", "وه", "هو", "ها"], // "آه", "آوا" kept with 'آ'
     backgroundUrl: "https://placehold.co/1920x1080.png",
     dataAiHint: "traditional teahouse",
     gridSize: { rows: 5, cols: 4 },
