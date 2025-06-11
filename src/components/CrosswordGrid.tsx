@@ -22,15 +22,19 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
     return cells;
   }, [targetWords]);
 
+  // Adjust cell size for better fit on mobile, especially for larger grids
+  const cellSizeRem = Math.min(2.5, 20 / Math.max(gridSize.cols, gridSize.rows)); // e.g. 2.5rem for small grids, smaller for large
+
+
   return (
-    <div className="flex justify-center items-center p-4 bg-secondary/30 rounded-lg shadow-inner mb-6" dir="rtl">
+    <div className="flex justify-center items-center p-2 bg-secondary/30 rounded-lg shadow-inner" dir="rtl">
       <div
         className="grid border border-border"
         style={{
           gridTemplateColumns: `repeat(${gridSize.cols}, minmax(0, 1fr))`,
-          width: `${gridSize.cols * 3}rem`, 
-          height: `${gridSize.rows * 3}rem`,
-          direction: 'rtl', // Make the grid layout RTL
+          width: `${gridSize.cols * cellSizeRem}rem`, 
+          height: `${gridSize.rows * cellSizeRem}rem`,
+          direction: 'rtl', 
         }}
       >
         {Array.from({ length: gridSize.rows }).map((_, r) =>
@@ -43,13 +47,13 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
             return (
               <div
                 key={cellKey}
-                className={`w-full h-full flex items-center justify-center border border-border text-2xl font-bold
+                className={`w-full h-full flex items-center justify-center border border-border text-xl sm:text-2xl font-bold
                   ${isActive ? 'bg-background' : 'bg-muted/50'}
                   ${letter ? 'text-accent animate-celebrate' : 'text-transparent'}
                   ${isHint && !letter ? 'bg-primary/20' : ''}
                 `}
+                style={{ fontSize: `${cellSizeRem * 0.6}rem`}} // Dynamically adjust font size based on cell size
               >
-                {/* Ensure letter content itself respects RTL if needed by font/browser */}
                 {letter || (isHint ? '؟' : '')} 
               </div>
             );
@@ -61,5 +65,3 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
 };
 
 export default CrosswordGrid;
-
-    

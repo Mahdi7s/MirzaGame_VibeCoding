@@ -36,14 +36,14 @@ export default function HomePage() {
   const [isLevelComplete, setIsLevelComplete] = useState(false);
   const { toast } = useToast();
 
+  const disabledDraggableInput = useMemo(() => currentWord.length >= 7, [currentWord]);
+
   const initializeGrid = useCallback((level: Level): GridCell[][] => {
     const newGrid = Array(level.gridSize.rows)
       .fill(null)
       .map(() => Array(level.gridSize.cols).fill(null));
     return newGrid;
   }, []);
-
-  const disabledDraggableInput = useMemo(() => currentWord.length >= 7, [currentWord]);
 
   useEffect(() => {
     const newLevel = levels[currentLevelIndex];
@@ -59,12 +59,12 @@ export default function HomePage() {
     setRevealedHintCells(new Set());
     setIsDraggingWord(false);
     
-    document.body.style.backgroundImage = '';
+    document.body.style.backgroundImage = ''; // Ensures no direct background image styling from JS
     document.body.style.backgroundSize = '';
     document.body.style.backgroundPosition = '';
     document.body.style.backgroundAttachment = '';
 
-  }, [currentLevelIndex, initializeGrid, levels]);
+  }, [currentLevelIndex, initializeGrid]); // `levels` is a constant import, not needed in deps
 
   const clearSelection = useCallback(() => {
     setSelectedLetterIndices([]);
@@ -118,10 +118,11 @@ export default function HomePage() {
     } else if (foundWords.has(currentWord) || foundBonusWords.has(currentWord)) {
       toast({ title: "تکراری", description: "این کلمه قبلا پیدا شده.", variant: "destructive", duration: 2000 });
     } else {
+      // Word is in persianWords but not a target or bonus word for this level
       toast({ title: "کلمه معتبر", description: `"${currentWord}" یک کلمه معتبر است، اما جزو کلمات این مرحله نیست.`, variant: "default", duration: 2500 });
     }
     clearSelection();
-  }, [currentWord, currentLevel, foundWords, foundBonusWords, updateGridWithWord, toast, clearSelection, score]);
+  }, [currentWord, currentLevel, foundWords, foundBonusWords, updateGridWithWord, toast, clearSelection]);
 
 
   const handleLetterMouseDown = useCallback((index: number) => {
@@ -142,20 +143,23 @@ export default function HomePage() {
     const handleMouseUpGlobal = () => {
       if (isDraggingWord) {
         setIsDraggingWord(false);
+        // Word submission is now triggered on drag end
         handleSubmitWord(); 
       }
     };
   
+    // Add event listeners only when dragging
     if (isDraggingWord) {
       document.addEventListener('mouseup', handleMouseUpGlobal);
       document.addEventListener('touchend', handleMouseUpGlobal);
     }
   
+    // Cleanup function
     return () => {
       document.removeEventListener('mouseup', handleMouseUpGlobal);
       document.removeEventListener('touchend', handleMouseUpGlobal);
     };
-  }, [isDraggingWord, handleSubmitWord]);
+  }, [isDraggingWord, handleSubmitWord]); // Dependencies for adding/removing listeners
 
 
   const handleShuffleLetters = () => {
@@ -200,24 +204,6 @@ export default function HomePage() {
     }
   };
 
-  const handleRevealAllWords = () => {
-    setGridState(prevGrid => {
-      const newGrid = prevGrid.map(row => [...row]);
-      currentLevel.targetWords.forEach(wordEntry => {
-        for (let i = 0; i < wordEntry.word.length; i++) {
-          const char = wordEntry.word[i];
-          if (wordEntry.direction === 'horizontal') {
-            newGrid[wordEntry.startY][wordEntry.startX + i] = char;
-          } else {
-            newGrid[wordEntry.startY + i][wordEntry.startX] = char;
-          }
-        }
-      });
-      return newGrid;
-    });
-    toast({ title: "کلمات نمایش داده شدند", description: "تمام کلمات هدف در جدول نشان داده شدند.", duration: 3000 });
-  };
-
   const handleNextLevel = () => {
     if (currentLevelIndex < levels.length - 1) {
       setCurrentLevelIndex(prev => prev + 1);
@@ -237,37 +223,41 @@ export default function HomePage() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.5 }}
-        className="min-h-screen flex flex-col items-center p-4 container mx-auto font-body"
+        className="min-h-screen flex flex-col items-center p-2 sm:p-4 container mx-auto font-body"
       >
         <GameHeader levelName={currentLevel.name} score={score} />
         
         <main className="flex-grow flex flex-col items-center justify-start w-full max-w-2xl">
-          <CrosswordGrid 
-            gridState={gridState} 
-            gridSize={currentLevel.gridSize}
-            targetWords={currentLevel.targetWords}
-            revealedHintCells={revealedHintCells}
-          />
+          <div className="my-3 w-full">
+            <CrosswordGrid 
+              gridState={gridState} 
+              gridSize={currentLevel.gridSize}
+              targetWords={currentLevel.targetWords}
+              revealedHintCells={revealedHintCells}
+            />
+          </div>
           
-          <CurrentWordDisplay word={currentWord} />
+          <div className="my-2 w-full">
+            <CurrentWordDisplay word={currentWord} />
+          </div>
           
-          <LetterCircle 
-            letters={availableLetters} 
-            onLetterMouseDown={handleLetterMouseDown}
-            onLetterMouseEnter={handleLetterMouseEnter}
-            selectedIndices={selectedLetterIndices}
-            disabled={disabledDraggableInput}
-          />
+          <div className="my-4 w-full">
+            <LetterCircle 
+              letters={availableLetters} 
+              onLetterMouseDown={handleLetterMouseDown}
+              onLetterMouseEnter={handleLetterMouseEnter}
+              selectedIndices={selectedLetterIndices}
+              disabled={disabledDraggableInput}
+            />
+          </div>
           
-          <GameControls 
-            onSubmit={handleSubmitWord}
-            onClear={clearSelection}
-            onShuffle={handleShuffleLetters}
-            onHint={handleHint}
-            onRevealWords={handleRevealAllWords}
-            canSubmit={currentWord.length > 0 && !isDraggingWord}
-            isHintDisabled={isHintDisabled}
-          />
+          <div className="my-3 w-full">
+            <GameControls 
+              onShuffle={handleShuffleLetters}
+              onHint={handleHint}
+              isHintDisabled={isHintDisabled}
+            />
+          </div>
         </main>
 
         <LevelCompleteDialog 
@@ -281,3 +271,4 @@ export default function HomePage() {
     </AnimatePresence>
   );
 }
+
