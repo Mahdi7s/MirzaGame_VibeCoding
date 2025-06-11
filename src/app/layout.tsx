@@ -1,10 +1,11 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'واژه بهشت (Vāژه Behesht)',
-  description: 'A Persian word game - Word Paradise',
+  title: 'آغامیرزا',
+  description: 'یک بازی کلمات فارسی جذاب - آغامیرزا',
 };
 
 export default function RootLayout({

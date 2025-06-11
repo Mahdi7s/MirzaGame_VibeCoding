@@ -22,12 +22,11 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
     return cells;
   }, [targetWords]);
 
-  // Adjust cell size for better fit on mobile, especially for larger grids
-  const cellSizeRem = Math.min(2.5, 20 / Math.max(gridSize.cols, gridSize.rows)); // e.g. 2.5rem for small grids, smaller for large
+  const cellSizeRem = Math.min(2.5, 20 / Math.max(gridSize.cols, gridSize.rows));
 
 
   return (
-    <div className="flex justify-center items-center p-2 bg-secondary/30 rounded-lg shadow-inner" dir="rtl">
+    <div className="flex justify-center items-center p-1 bg-secondary rounded-lg shadow-inner" dir="rtl">
       <div
         className="grid border border-border"
         style={{
@@ -48,11 +47,11 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
               <div
                 key={cellKey}
                 className={`w-full h-full flex items-center justify-center border border-border text-xl sm:text-2xl font-bold
-                  ${isActive ? 'bg-background' : 'bg-muted/50'}
+                  ${isActive ? 'bg-background' : 'bg-muted'}
                   ${letter ? 'text-accent animate-celebrate' : 'text-transparent'}
                   ${isHint && !letter ? 'bg-primary/20' : ''}
                 `}
-                style={{ fontSize: `${cellSizeRem * 0.6}rem`}} // Dynamically adjust font size based on cell size
+                style={{ fontSize: `${cellSizeRem * 0.6}rem`}}
               >
                 {letter || (isHint ? '؟' : '')} 
               </div>

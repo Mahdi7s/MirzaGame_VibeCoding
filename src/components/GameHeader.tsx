@@ -9,16 +9,16 @@ interface GameHeaderProps {
 
 const GameHeader: FC<GameHeaderProps> = ({ levelName, score }) => {
   return (
-    <header className="py-2 px-3 mb-2 bg-background/80 backdrop-blur-sm shadow-md rounded-lg w-full">
+    <header className="py-1 px-3 mb-1 bg-background/80 backdrop-blur-sm shadow-md rounded-lg w-full">
       <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center">
         <div className="flex items-center gap-2 mb-1 sm:mb-0">
-          <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
-          <h1 className="text-2xl sm:text-3xl font-headline font-bold text-primary">واژه بهشت</h1>
+          <Sparkles className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
+          <h1 className="text-xl sm:text-2xl font-headline font-bold text-primary">آغامیرزا</h1>
         </div>
-        <div className="flex items-center gap-4 sm:gap-6 text-base sm:text-lg">
+        <div className="flex items-center gap-3 sm:gap-4 text-sm sm:text-base">
           <span className="font-semibold text-foreground/80">{levelName}</span>
           <div className="flex items-center gap-1 text-primary">
-            <Award className="w-5 h-5 sm:w-6 sm:h-6" />
+            <Award className="w-4 h-4 sm:w-5 sm:h-5" />
             <span className="font-bold">{score}</span>
           </div>
         </div>
