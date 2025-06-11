@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 body {
-  font-family: 'Literata', serif;
+  font-family: 'B Titr', serif; /* Changed to B Titr */
 }
 
 @layer base {
@@ -89,6 +89,7 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+     /* font-family is now set directly above, outside @layer base for higher specificity if needed */
   }
 }
 

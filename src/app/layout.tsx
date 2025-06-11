@@ -14,14 +14,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // Ensure 'dark' class is NOT applied here if dark is the default via :root in globals.css
-    // Or, if you want to allow light/dark toggle later, you might add it dynamically.
-    // For now, :root in globals.css defines the dark theme as default.
-    <html lang="fa" dir="rtl"> 
+    <html lang="fa" dir="rtl">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&display=swap" rel="stylesheet" />
+        {/* The Google Font import for Literata has been removed. */}
+        {/* If you have B Titr font files (e.g., woff2), you would typically add @font-face rules in globals.css */}
       </head>
       <body className="font-body antialiased">
         {children}

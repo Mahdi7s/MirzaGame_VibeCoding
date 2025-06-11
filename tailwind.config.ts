@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -10,8 +11,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Literata', 'serif'],
-        headline: ['Literata', 'serif'],
+        body: ['"B Titr"', 'serif'], // Changed to B Titr
+        headline: ['"B Titr"', 'serif'], // Changed to B Titr
         code: ['monospace'],
       },
       colors: {
