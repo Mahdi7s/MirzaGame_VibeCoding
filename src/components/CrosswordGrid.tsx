@@ -24,9 +24,8 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
 
   const cellSizeRem = Math.min(3, 25 / Math.max(gridSize.cols, gridSize.rows));
 
-
   return (
-    <div className="flex justify-center items-center p-1 bg-secondary rounded-lg shadow-inner" dir="rtl">
+    <div className="flex justify-center items-center p-1 rounded-lg shadow-inner" dir="rtl">
       <div
         className="grid border border-border"
         style={{
@@ -47,7 +46,7 @@ const CrosswordGrid: FC<CrosswordGridProps> = ({ gridState, gridSize, targetWord
               <div
                 key={cellKey}
                 className={`w-full h-full flex items-center justify-center border border-border text-xl sm:text-2xl font-bold
-                  ${isActive ? 'bg-background' : 'bg-muted/50'}
+                  ${isActive ? 'bg-input' : 'bg-muted/70'} /* Changed for dark mode visibility */
                   ${letter ? 'text-accent animate-celebrate' : 'text-transparent'}
                   ${isHint && !letter ? 'bg-primary/20' : ''}
                 `}

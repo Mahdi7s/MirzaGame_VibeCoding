@@ -14,7 +14,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl">
+    // Ensure 'dark' class is NOT applied here if dark is the default via :root in globals.css
+    // Or, if you want to allow light/dark toggle later, you might add it dynamically.
+    // For now, :root in globals.css defines the dark theme as default.
+    <html lang="fa" dir="rtl"> 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
