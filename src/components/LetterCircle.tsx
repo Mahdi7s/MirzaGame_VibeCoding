@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { type FC, useMemo } from 'react';
+import React, { type FC, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 interface LetterCircleProps {
@@ -18,6 +18,7 @@ const LetterCircle: FC<LetterCircleProps> = ({ letters, onLetterMouseDown, onLet
   const buttonRadius = buttonSize / 2;
   const circleContainerSize = radius * 2 + buttonSize + 20; 
   const svgCenter = circleContainerSize / 2;
+  const lastHoveredIndexRef = useRef<number | null>(null);
 
   const selectedPositions = useMemo(() => {
     if (letters.length === 0) return [];
@@ -84,12 +85,36 @@ const LetterCircle: FC<LetterCircleProps> = ({ letters, onLetterMouseDown, onLet
               }}
               onTouchStart={(e) => {
                 if (!disabled) {
+                  // e.preventDefault(); // Prevent default only if necessary, could interfere with other touch actions
                   onLetterMouseDown(index);
+                  lastHoveredIndexRef.current = index; // Initialize on touch start
                 }
               }}
               onTouchMove={(e) => {
                 if (!disabled) {
-                  e.preventDefault();
+                  e.preventDefault(); // Essential to prevent scrolling
+                  const touch = e.touches[0];
+                  if (touch) {
+                    const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
+                    if (elementUnderTouch) {
+                      const letterButton = elementUnderTouch.closest('[data-letter-index]');
+                      if (letterButton) {
+                        const newIndexStr = letterButton.getAttribute('data-letter-index');
+                        if (newIndexStr) {
+                          const newIndex = parseInt(newIndexStr, 10);
+                          if (lastHoveredIndexRef.current !== newIndex) {
+                            onLetterMouseEnter(newIndex);
+                            lastHoveredIndexRef.current = newIndex;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }}
+              onTouchEnd={() => {
+                if (!disabled) {
+                  lastHoveredIndexRef.current = null; // Reset on touch end
                 }
               }}
               className={`absolute w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold shadow-lg z-10
@@ -103,6 +128,7 @@ const LetterCircle: FC<LetterCircleProps> = ({ letters, onLetterMouseDown, onLet
               whileHover={{ scale: disabled && !isSelected ? 1 : 1.1 }}
               transition={{ type: "spring", stiffness: 300 }}
               aria-label={`حرف ${letter}`}
+              data-letter-index={index} // Add data attribute for easy identification
             >
               {letter}
             </motion.button>
