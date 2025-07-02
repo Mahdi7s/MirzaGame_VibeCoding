@@ -16,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" className="dark">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         {/* Font files (e.g., woff2 for B Titr) would typically be linked here or via @font-face in globals.css */}
         {/* For this setup, we rely on the user having 'B Titr' installed or CSS fallback. */}
       </head>
