@@ -87,6 +87,11 @@ const LetterCircle: FC<LetterCircleProps> = ({ letters, onLetterMouseDown, onLet
                   onLetterMouseDown(index);
                 }
               }}
+              onTouchMove={(e) => {
+                if (!disabled) {
+                  e.preventDefault();
+                }
+              }}
               className={`absolute w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold shadow-lg z-10
                           ${isSelected ? 'bg-primary text-primary-foreground scale-110' : 'bg-secondary text-secondary-foreground hover:bg-primary/80'}
                           ${disabled && !isSelected ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
