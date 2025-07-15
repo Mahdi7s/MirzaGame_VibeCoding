@@ -7,7 +7,7 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/game');
+    router.replace('/MirzaGame_VibeCoding/game');
   }, [router]);
 
   return null;
